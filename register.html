@@ -4,9 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>Create Account | SomCity</title>
-
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <title>Create Account | SomChat</title>
 
   <style>
     * {
@@ -17,99 +15,92 @@
     }
 
     body {
+      background: #f2f5f8;
       min-height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
-      background: #07111f;
-      color: white;
       padding: 20px;
     }
 
-    .box {
+    .container {
       width: 100%;
       max-width: 420px;
-      background: #142033;
-      padding: 35px;
+      background: white;
+      padding: 30px 25px;
       border-radius: 18px;
-      box-shadow: 0 15px 40px rgba(0,0,0,0.35);
+      box-shadow: 0 8px 30px rgba(0,0,0,0.08);
     }
 
     .logo {
       text-align: center;
-      font-size: 32px;
+      font-size: 30px;
       font-weight: bold;
-      margin-bottom: 8px;
+      color: #087f5b;
+      margin-bottom: 10px;
     }
 
-    .logo span {
-      color: #2f8cff;
+    h2 {
+      text-align: center;
+      margin-bottom: 8px;
     }
 
     .subtitle {
       text-align: center;
-      color: #9caabd;
+      color: #777;
       margin-bottom: 25px;
     }
 
     label {
       display: block;
-      margin: 15px 0 8px;
+      margin-bottom: 7px;
       font-weight: bold;
     }
 
     input {
       width: 100%;
-      padding: 14px;
-      border: 1px solid #35465d;
-      border-radius: 9px;
-      background: #0b1626;
-      color: white;
+      padding: 13px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      margin-bottom: 17px;
+      font-size: 16px;
       outline: none;
-      font-size: 15px;
     }
 
     input:focus {
-      border-color: #2f8cff;
+      border-color: #087f5b;
     }
 
     button {
       width: 100%;
-      margin-top: 25px;
-      padding: 15px;
-      border: 0;
-      border-radius: 9px;
-      background: #2f8cff;
+      padding: 14px;
+      border: none;
+      border-radius: 10px;
+      background: #087f5b;
       color: white;
-      font-size: 16px;
+      font-size: 17px;
       font-weight: bold;
       cursor: pointer;
     }
 
     button:hover {
-      background: #2478dc;
-    }
-
-    button:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
+      background: #066b4d;
     }
 
     #message {
       text-align: center;
-      margin-top: 18px;
-      line-height: 1.5;
+      margin-top: 15px;
+      color: #d9534f;
     }
 
-    .links {
+    .bottom {
       text-align: center;
       margin-top: 20px;
-      line-height: 2;
-      color: #9caabd;
+      color: #777;
     }
 
-    a {
-      color: #2f8cff;
+    .bottom a {
+      color: #087f5b;
       text-decoration: none;
       font-weight: bold;
     }
@@ -118,309 +109,99 @@
 
 <body>
 
-  <div class="box">
+  <div class="container">
 
-    <div class="logo">
-      🎮 Som<span>City</span>
-    </div>
+    <div class="logo">💬 SomChat</div>
+
+    <h2>Create Account</h2>
 
     <p class="subtitle">
-      Create your SomCity account
+      Join SomChat today
     </p>
 
     <form id="registerForm">
 
-      <label for="email">
-        Email
-      </label>
-
+      <label for="username">Username</label>
       <input
-        id="email"
+        type="text"
+        id="username"
+        placeholder="Enter username"
+        required
+      >
+
+      <label for="email">Email</label>
+      <input
         type="email"
-        placeholder="Enter your email"
-        autocomplete="email"
+        id="email"
+        placeholder="Enter email"
         required
       >
 
-      <label for="password">
-        Password
-      </label>
-
+      <label for="password">Password</label>
       <input
+        type="password"
         id="password"
-        type="password"
-        placeholder="Create a password"
-        autocomplete="new-password"
+        placeholder="Enter password"
         minlength="6"
         required
       >
 
-      <label for="confirmPassword">
-        Confirm Password
-      </label>
-
-      <input
-        id="confirmPassword"
-        type="password"
-        placeholder="Confirm your password"
-        autocomplete="new-password"
-        minlength="6"
-        required
-      >
-
-      <button
-        id="registerButton"
-        type="submit"
-      >
-        🚀 CREATE ACCOUNT
+      <button type="submit">
+        Create Account
       </button>
 
     </form>
 
     <div id="message"></div>
 
-    <div class="links">
-
-      <p>
-        Already have an account?
-        <a href="login.html">
-          Login
-        </a>
-      </p>
-
-      <a href="index.html">
-        🏠 Back Home
-      </a>
-
+    <div class="bottom">
+      Already have an account?
+      <a href="login.html">Login</a>
     </div>
 
   </div>
 
-
   <script>
-
-    /* =================================
-       SUPABASE
-    ================================= */
-
-    const SUPABASE_URL =
-      "https://ayaaiycdzuzxcouybknc.supabase.co";
-
-    const SUPABASE_KEY =
-      "sb_publishable_RGaGCj_L5Mc548GoyJHp-w_0ee65lBC";
-
-
-    const supabaseClient =
-      window.supabase.createClient(
-        SUPABASE_URL,
-        SUPABASE_KEY
-      );
-
-
-    /* =================================
-       ELEMENTS
-    ================================= */
-
-    const registerForm =
-      document.getElementById("registerForm");
-
-    const emailInput =
-      document.getElementById("email");
-
-    const passwordInput =
-      document.getElementById("password");
-
-    const confirmPasswordInput =
-      document.getElementById("confirmPassword");
-
-    const message =
-      document.getElementById("message");
-
-    const registerButton =
-      document.getElementById("registerButton");
-
-
-    /* =================================
-       REGISTER
-    ================================= */
-
-    registerForm.addEventListener(
-      "submit",
-      async function(event) {
+    document
+      .getElementById("registerForm")
+      .addEventListener("submit", function(event) {
 
         event.preventDefault();
 
+        const username =
+          document.getElementById("username").value.trim();
 
         const email =
-          emailInput.value.trim();
+          document.getElementById("email").value.trim();
 
         const password =
-          passwordInput.value;
+          document.getElementById("password").value;
 
-        const confirmPassword =
-          confirmPasswordInput.value;
+        const message =
+          document.getElementById("message");
 
-
-        message.style.color =
-          "#9caabd";
-
-        message.textContent =
-          "Creating account...";
-
-
-        registerButton.disabled = true;
-
-
-        if (!email || !password || !confirmPassword) {
-
-          message.style.color =
-            "#ff6b6b";
-
+        if (username.length < 3) {
           message.textContent =
-            "Please fill in all fields.";
-
-          registerButton.disabled = false;
-
+            "Username must be at least 3 characters.";
           return;
         }
-
 
         if (password.length < 6) {
-
-          message.style.color =
-            "#ff6b6b";
-
           message.textContent =
             "Password must be at least 6 characters.";
-
-          registerButton.disabled = false;
-
           return;
         }
 
+        message.style.color = "#087f5b";
+        message.textContent =
+          "Account form is ready. Supabase will be connected next.";
 
-        if (password !== confirmPassword) {
-
-          message.style.color =
-            "#ff6b6b";
-
-          message.textContent =
-            "Passwords do not match.";
-
-          registerButton.disabled = false;
-
-          return;
-        }
-
-
-        try {
-
-          const { data, error } =
-            await supabaseClient.auth
-              .signUp({
-
-                email: email,
-
-                password: password
-
-              });
-
-
-          if (error) {
-
-            message.style.color =
-              "#ff6b6b";
-
-            message.textContent =
-              "❌ " + error.message;
-
-            registerButton.disabled = false;
-
-            return;
-          }
-
-
-          if (!data || !data.user) {
-
-            message.style.color =
-              "#ff6b6b";
-
-            message.textContent =
-              "❌ Account could not be created.";
-
-            registerButton.disabled = false;
-
-            return;
-          }
-
-
-          /* =================================
-             EMAIL CONFIRMATION
-          ================================= */
-
-          if (
-            data.user.identities &&
-            data.user.identities.length === 0
-          ) {
-
-            message.style.color =
-              "#ff6b6b";
-
-            message.textContent =
-              "❌ This email may already be registered.";
-
-            registerButton.disabled = false;
-
-            return;
-          }
-
-
-          message.style.color =
-            "#4ade80";
-
-
-          if (data.session) {
-
-            message.textContent =
-              "✅ Account created successfully!";
-
-
-            setTimeout(function() {
-
-              window.location.href =
-                "index.html";
-
-            }, 1000);
-
-          } else {
-
-            message.innerHTML =
-              "✅ Account created!<br>" +
-              "Check your email to confirm your account.";
-
-            registerButton.disabled = false;
-
-          }
-
-
-        } catch (error) {
-
-          console.error(error);
-
-          message.style.color =
-            "#ff6b6b";
-
-          message.textContent =
-            "❌ Something went wrong.";
-
-          registerButton.disabled = false;
-
-        }
-
-      }
-    );
-
+        console.log({
+          username,
+          email
+        });
+      });
   </script>
 
 </body>
-  </html>
+</html>
