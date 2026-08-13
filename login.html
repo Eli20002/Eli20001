@@ -1,260 +1,211 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
 
-  <title>SomChat - Login</title>
+<title>SomChat - Login</title>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase.js"></script>
 
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: Arial, sans-serif;
-    }
+<style>
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+  font-family:Arial,sans-serif;
+}
 
-    body {
-      min-height: 100vh;
-      background: linear-gradient(135deg, #075e54, #128c7e);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 20px;
-    }
+body{
+  min-height:100vh;
+  background:linear-gradient(135deg,#075e54,#128c7e);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  padding:20px;
+}
 
-    .box {
-      width: 100%;
-      max-width: 420px;
-      background: #fff;
-      padding: 30px 25px;
-      border-radius: 20px;
-      box-shadow: 0 10px 30px rgba(0,0,0,.2);
-    }
+.box{
+  width:100%;
+  max-width:420px;
+  background:white;
+  padding:30px 25px;
+  border-radius:20px;
+  box-shadow:0 10px 30px rgba(0,0,0,.2);
+}
 
-    .logo {
-      text-align: center;
-      font-size: 45px;
-      margin-bottom: 8px;
-    }
+.logo{
+  text-align:center;
+  font-size:42px;
+}
 
-    h1 {
-      text-align: center;
-      color: #075e54;
-    }
+h1{
+  text-align:center;
+  color:#075e54;
+  margin:8px 0 25px;
+}
 
-    .sub {
-      text-align: center;
-      color: #777;
-      margin: 8px 0 25px;
-    }
+label{
+  display:block;
+  margin:13px 0 6px;
+  font-weight:bold;
+}
 
-    label {
-      display: block;
-      margin: 14px 0 6px;
-      font-weight: bold;
-    }
+input{
+  width:100%;
+  padding:14px;
+  border:1px solid #ddd;
+  border-radius:10px;
+  font-size:16px;
+}
 
-    input {
-      width: 100%;
-      padding: 14px;
-      border: 1px solid #ddd;
-      border-radius: 10px;
-      font-size: 16px;
-      outline: none;
-    }
+button{
+  width:100%;
+  padding:14px;
+  margin-top:22px;
+  border:0;
+  border-radius:10px;
+  background:#075e54;
+  color:white;
+  font-size:17px;
+  font-weight:bold;
+}
 
-    input:focus {
-      border-color: #128c7e;
-    }
+#result{
+  text-align:center;
+  margin-top:15px;
+}
 
-    button {
-      width: 100%;
-      padding: 14px;
-      margin-top: 22px;
-      border: 0;
-      border-radius: 10px;
-      background: #25d366;
-      color: white;
-      font-size: 17px;
-      font-weight: bold;
-    }
+.register{
+  text-align:center;
+  margin-top:20px;
+  color:#777;
+}
 
-    button:disabled {
-      opacity: .6;
-    }
-
-    #message {
-      text-align: center;
-      margin-top: 15px;
-      line-height: 1.5;
-    }
-
-    .register {
-      text-align: center;
-      margin-top: 20px;
-      color: #666;
-    }
-
-    .register a {
-      color: #075e54;
-      font-weight: bold;
-      text-decoration: none;
-    }
-  </style>
+.register a{
+  color:#075e54;
+  font-weight:bold;
+  text-decoration:none;
+}
+</style>
 </head>
 
 <body>
 
 <div class="box">
 
-  <div class="logo">💬</div>
+<div class="logo">💬</div>
 
-  <h1>SomChat</h1>
+<h1>Login</h1>
 
-  <p class="sub">Login to your account</p>
+<form id="form">
 
-  <form id="loginForm">
+<label>Email</label>
 
-    <label>Email</label>
+<input
+  id="email"
+  type="email"
+  placeholder="Email"
+  required
+>
 
-    <input
-      id="email"
-      type="email"
-      placeholder="Enter your email"
-      required
-    >
+<label>Password</label>
 
-    <label>Password</label>
+<input
+  id="password"
+  type="password"
+  placeholder="Password"
+  required
+>
 
-    <input
-      id="password"
-      type="password"
-      placeholder="Enter your password"
-      required
-    >
+<button id="button" type="submit">
+Login
+</button>
 
-    <button id="loginButton" type="submit">
-      Login
-    </button>
+</form>
 
-  </form>
+<div id="result"></div>
 
-  <div id="message"></div>
-
-  <div class="register">
-    Don't have an account?
-    <a href="register.html">Create Account</a>
-  </div>
+<div class="register">
+Don't have an account?
+<a href="register.html">
+Create Account
+</a>
+</div>
 
 </div>
 
 <script>
 
-const SUPABASE_URL =
-  "https://praguwyyshmhmmowofqv.supabase.co";
-
-const SUPABASE_ANON_KEY =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNByYWd1d3l5c2htaG1tb3dvZnF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY1NzA3NjYsImV4cCI6MjEwMjE0Njc2Nn0.oJjsk_93uBMLeT-8ydDeecJBpcKI4IwTZaVmDU0t-fk";
-
-const supabaseClient =
-  window.supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_ANON_KEY
-  );
-
-
 const form =
-  document.getElementById("loginForm");
+document.getElementById("form");
 
 const button =
-  document.getElementById("loginButton");
+document.getElementById("button");
 
-const message =
-  document.getElementById("message");
+const result =
+document.getElementById("result");
 
-
-form.addEventListener("submit", async function(e) {
+form.addEventListener(
+"submit",
+async function(e){
 
   e.preventDefault();
 
+  button.disabled=true;
+  button.textContent="Logging in...";
+
+  result.innerHTML="";
+
   const email =
     document.getElementById("email")
-      .value.trim();
+    .value.trim();
 
   const password =
     document.getElementById("password")
-      .value;
+    .value;
 
-
-  button.disabled = true;
-  button.textContent = "Logging in...";
-
-  message.innerHTML = "";
-
-
-  try {
+  try{
 
     const {
       data,
       error
-    } = await supabaseClient.auth.signInWithPassword({
+    } =
+    await supabaseClient.auth
+    .signInWithPassword({
 
-      email: email,
+      email:email,
 
-      password: password
+      password:password
 
     });
 
-
-    if (error) {
+    if(error)
       throw error;
-    }
 
+    if(!data.user)
+      throw new Error("Login failed.");
 
-    if (!data.user) {
+    result.innerHTML =
+      "✅ Login successful!";
 
-      throw new Error(
-        "Login failed."
-      );
+    setTimeout(function(){
 
-    }
+      location.href="users.html";
 
+    },800);
 
-    // Set user online
-    await supabaseClient
-      .from("profiles")
-      .update({
-        online: true,
-        last_seen: new Date().toISOString()
-      })
-      .eq("id", data.user.id);
-
-
-    message.innerHTML =
-      "✅ Login successful!<br>" +
-      "Opening SomChat...";
-
-
-    setTimeout(() => {
-
-      window.location.href =
-        "users.html";
-
-    }, 1000);
-
-
-  } catch (error) {
+  }
+  catch(error){
 
     console.error(error);
 
-    message.innerHTML =
+    result.innerHTML =
       "❌ " + error.message;
 
-    button.disabled = false;
-    button.textContent = "Login";
+    button.disabled=false;
+    button.textContent="Login";
 
   }
 
