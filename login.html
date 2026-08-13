@@ -6,6 +6,8 @@
 
   <title>Login | SomChat</title>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
   <style>
     * {
       box-sizing: border-box;
@@ -18,26 +20,26 @@
       background: #f2f5f8;
       min-height: 100vh;
       display: flex;
-      justify-content: center;
       align-items: center;
+      justify-content: center;
       padding: 20px;
     }
 
     .container {
       width: 100%;
-      max-width: 420px;
+      max-width: 430px;
       background: white;
       padding: 30px 25px;
       border-radius: 18px;
-      box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+      box-shadow: 0 8px 30px rgba(0,0,0,.08);
     }
 
     .logo {
       text-align: center;
+      color: #087f5b;
       font-size: 30px;
       font-weight: bold;
-      color: #087f5b;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
     }
 
     h2 {
@@ -53,8 +55,8 @@
 
     label {
       display: block;
-      margin-bottom: 7px;
       font-weight: bold;
+      margin-bottom: 7px;
     }
 
     input {
@@ -74,7 +76,7 @@
     button {
       width: 100%;
       padding: 14px;
-      border: none;
+      border: 0;
       border-radius: 10px;
       background: #087f5b;
       color: white;
@@ -83,14 +85,14 @@
       cursor: pointer;
     }
 
-    button:hover {
-      background: #066b4d;
+    button:disabled {
+      opacity: .6;
     }
 
     #message {
       text-align: center;
       margin-top: 15px;
-      color: #d9534f;
+      line-height: 1.5;
     }
 
     .bottom {
@@ -101,87 +103,152 @@
 
     .bottom a {
       color: #087f5b;
-      text-decoration: none;
       font-weight: bold;
+      text-decoration: none;
     }
   </style>
 </head>
 
 <body>
 
-  <div class="container">
+<div class="container">
 
-    <div class="logo">💬 SomChat</div>
+  <div class="logo">💬 SomChat</div>
 
-    <h2>Welcome Back</h2>
+  <h2>Welcome Back</h2>
 
-    <p class="subtitle">
-      Login to your SomChat account
-    </p>
+  <p class="subtitle">
+    Login to your SomChat account
+  </p>
 
-    <form id="loginForm">
+  <form id="loginForm">
 
-      <label for="email">Email</label>
+    <label for="email">Email</label>
 
-      <input
-        type="email"
-        id="email"
-        placeholder="Enter your email"
-        required
-      >
+    <input
+      id="email"
+      type="email"
+      placeholder="Enter your email"
+      required
+    >
 
-      <label for="password">Password</label>
+    <label for="password">Password</label>
 
-      <input
-        type="password"
-        id="password"
-        placeholder="Enter your password"
-        required
-      >
+    <input
+      id="password"
+      type="password"
+      placeholder="Enter your password"
+      required
+    >
 
-      <button type="submit">
-        Login
-      </button>
+    <button id="loginButton" type="submit">
+      Login
+    </button>
 
-    </form>
+  </form>
 
-    <div id="message"></div>
+  <div id="message"></div>
 
-    <div class="bottom">
-      Don't have an account?
-      <a href="register.html">Create Account</a>
-    </div>
-
+  <div class="bottom">
+    Don't have an account?
+    <a href="register.html">Create Account</a>
   </div>
 
-  <script>
-    document
-      .getElementById("loginForm")
-      .addEventListener("submit", function(event) {
+</div>
 
-        event.preventDefault();
+<script>
+  // ================================
+  // SOMCHAT SUPABASE CONFIG
+  // ================================
 
-        const email =
-          document.getElementById("email").value.trim();
+  const SUPABASE_URL =
+    "https://praguwyyshmhmmowofqv.supabase.co";
 
-        const password =
-          document.getElementById("password").value;
+  const SUPABASE_KEY =
+    "sb_publishable_JPzVvllEgAUcBD_ahGZR6g_Z2rrzRDW";
 
-        const message =
-          document.getElementById("message");
+  const supabaseClient =
+    window.supabase.createClient(
+      SUPABASE_URL,
+      SUPABASE_KEY
+    );
 
-        if (!email || !password) {
-          message.textContent =
-            "Please enter your email and password.";
-          return;
-        }
+  // ================================
+  // LOGIN
+  // ================================
 
-        message.style.color = "#087f5b";
-        message.textContent =
-          "Login form is ready. Supabase will be connected next.";
+  const form =
+    document.getElementById("loginForm");
 
+  const message =
+    document.getElementById("message");
+
+  const button =
+    document.getElementById("loginButton");
+
+  form.addEventListener("submit", async function(event) {
+
+    event.preventDefault();
+
+    const email =
+      document.getElementById("email")
+        .value
+        .trim();
+
+    const password =
+      document.getElementById("password")
+        .value;
+
+    message.textContent = "";
+    message.style.color = "#555";
+
+    button.disabled = true;
+    button.textContent = "Logging in...";
+
+    try {
+
+      const {
+        data,
+        error
+      } = await supabaseClient.auth.signInWithPassword({
+        email: email,
+        password: password
       });
-  </script>
+
+      if (error) {
+        throw error;
+      }
+
+      if (!data.user) {
+        throw new Error("Login failed.");
+      }
+
+      message.style.color = "#087f5b";
+      message.textContent =
+        "Login successful!";
+
+      setTimeout(function() {
+        window.location.href = "chat.html";
+      }, 800);
+
+    } catch (error) {
+
+      console.error(error);
+
+      message.style.color = "#d9534f";
+
+      message.textContent =
+        error.message ||
+        "Email or password is incorrect.";
+
+    } finally {
+
+      button.disabled = false;
+      button.textContent = "Login";
+    }
+
+  });
+</script>
 
 </body>
 </html>
