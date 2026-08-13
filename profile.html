@@ -4,9 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>My Profile | GameZone</title>
-
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <title>Profile | SomChat</title>
 
   <style>
     * {
@@ -17,124 +15,120 @@
     }
 
     body {
-      background: #070b12;
-      color: white;
+      background: #f2f5f8;
       min-height: 100vh;
     }
 
     header {
-      background: #111827;
-      padding: 20px 7%;
+      height: 65px;
+      background: #087f5b;
+      color: white;
       display: flex;
-      justify-content: space-between;
       align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
     }
 
     .logo {
-      font-size: 27px;
+      font-size: 23px;
       font-weight: bold;
     }
 
-    .logo span {
-      color: #38bdf8;
-    }
-
-    nav a {
+    header a {
       color: white;
       text-decoration: none;
-      margin-left: 18px;
+      font-weight: bold;
     }
 
-    nav a:hover {
-      color: #38bdf8;
-    }
-
-    .profile {
-      max-width: 800px;
-      margin: 60px auto;
+    .container {
+      max-width: 500px;
+      margin: 35px auto;
       padding: 20px;
     }
 
     .card {
-      background: #111827;
-      border: 1px solid #1e293b;
+      background: white;
       border-radius: 18px;
-      padding: 35px;
+      padding: 30px 25px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.08);
       text-align: center;
     }
 
     .avatar {
       width: 100px;
       height: 100px;
-      margin: auto;
       border-radius: 50%;
-      background: #2563eb;
+      background: #087f5b;
+      color: white;
       display: flex;
-      justify-content: center;
       align-items: center;
-      font-size: 45px;
+      justify-content: center;
+      font-size: 40px;
+      font-weight: bold;
+      margin: 0 auto 18px;
     }
 
     h1 {
-      margin-top: 20px;
+      font-size: 27px;
+      margin-bottom: 7px;
     }
 
-    .email {
-      color: #94a3b8;
-      margin-top: 8px;
+    .status {
+      color: #087f5b;
+      margin-bottom: 25px;
     }
 
-    .stats {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 15px;
-      margin-top: 30px;
+    .info {
+      text-align: left;
+      border-top: 1px solid #eee;
+      padding-top: 20px;
     }
 
-    .stat {
-      background: #0f172a;
-      padding: 20px;
-      border-radius: 12px;
+    .row {
+      margin-bottom: 18px;
     }
 
-    .stat h2 {
-      color: #38bdf8;
+    .label {
+      color: #777;
+      font-size: 14px;
+      margin-bottom: 5px;
     }
 
-    .stat p {
-      color: #94a3b8;
-      margin-top: 6px;
-    }
-
-    button {
-      margin-top: 30px;
-      padding: 14px 30px;
-      border: none;
-      border-radius: 9px;
-      background: #dc2626;
-      color: white;
+    .value {
+      font-size: 17px;
       font-weight: bold;
+    }
+
+    .buttons {
+      margin-top: 25px;
+      display: flex;
+      gap: 10px;
+    }
+
+    .btn {
+      flex: 1;
+      padding: 13px;
+      border-radius: 10px;
+      text-decoration: none;
+      font-weight: bold;
+      border: none;
       cursor: pointer;
+      font-size: 15px;
     }
 
-    #message {
-      margin-top: 20px;
-      color: #38bdf8;
+    .chat-btn {
+      background: #087f5b;
+      color: white;
     }
 
-    @media (max-width: 600px) {
-      header {
-        flex-direction: column;
-        gap: 15px;
-      }
+    .logout-btn {
+      background: #eee;
+      color: #333;
+    }
 
-      nav a {
-        margin: 0 6px;
-        font-size: 13px;
-      }
-
-      .stats {
-        grid-template-columns: 1fr;
+    @media (max-width: 550px) {
+      .container {
+        margin: 20px auto;
       }
     }
   </style>
@@ -142,145 +136,81 @@
 
 <body>
 
-  <header>
+<header>
+  <div class="logo">💬 SomChat</div>
 
-    <div class="logo">
-      🎮 Game<span>Zone</span>
+  <a href="chat.html">
+    Chat
+  </a>
+</header>
+
+<div class="container">
+
+  <div class="card">
+
+    <div class="avatar" id="avatar">
+      U
     </div>
 
-    <nav>
-      <a href="index.html">Home</a>
-      <a href="missions.html">Missions</a>
-      <a href="news.html">News</a>
-    </nav>
+    <h1 id="username">
+      SomChat User
+    </h1>
 
-  </header>
+    <div class="status">
+      ● Online
+    </div>
 
+    <div class="info">
 
-  <main class="profile">
-
-    <div class="card">
-
-      <div class="avatar">
-        👤
+      <div class="row">
+        <div class="label">Username</div>
+        <div class="value" id="usernameInfo">
+          SomChat User
+        </div>
       </div>
 
-      <h1 id="username">
-        Loading...
-      </h1>
-
-      <p class="email" id="email">
-        Loading...
-      </p>
-
-
-      <div class="stats">
-
-        <div class="stat">
-          <h2>0</h2>
-          <p>Points</p>
+      <div class="row">
+        <div class="label">Email</div>
+        <div class="value" id="emailInfo">
+          user@example.com
         </div>
-
-        <div class="stat">
-          <h2>0</h2>
-          <p>Missions</p>
-        </div>
-
-        <div class="stat">
-          <h2>#--</h2>
-          <p>Rank</p>
-        </div>
-
       </div>
 
+      <div class="row">
+        <div class="label">Country</div>
+        <div class="value">
+          Somalia 🇸🇴
+        </div>
+      </div>
 
-      <div id="message"></div>
+    </div>
 
-      <button id="logout">
-        🚪 LOGOUT
+    <div class="buttons">
+
+      <a href="chat.html" class="btn chat-btn">
+        💬 Open Chat
+      </a>
+
+      <button class="btn logout-btn" id="logout">
+        Logout
       </button>
 
     </div>
 
-  </main>
+  </div>
 
+</div>
 
-  <script>
+<script>
+  document
+    .getElementById("logout")
+    .addEventListener("click", function() {
 
-    const SUPABASE_URL = "YOUR_PROJECT_URL";
+      alert("Logout will be connected to Supabase next.");
 
-    const SUPABASE_KEY = "YOUR_PUBLISHABLE_KEY";
-
-
-    const supabaseClient =
-      window.supabase.createClient(
-        SUPABASE_URL,
-        SUPABASE_KEY
-      );
-
-
-    async function loadProfile() {
-
-      const {
-        data: {
-          user
-        }
-      } = await supabaseClient.auth.getUser();
-
-
-      if (!user) {
-
-        window.location.href =
-          "login.html";
-
-        return;
-      }
-
-
-      document.getElementById("email")
-        .textContent = user.email;
-
-
-      const {
-        data: profile,
-        error
-      } = await supabaseClient
-        .from("profiles")
-        .select("username")
-        .eq("id", user.id)
-        .single();
-
-
-      if (error) {
-
-        document.getElementById("username")
-          .textContent = "Player";
-
-        return;
-      }
-
-
-      document.getElementById("username")
-        .textContent = profile.username;
-
-    }
-
-
-    document
-      .getElementById("logout")
-      .addEventListener("click", async function() {
-
-        await supabaseClient.auth.signOut();
-
-        window.location.href =
-          "login.html";
-
-      });
-
-
-    loadProfile();
-
-  </script>
+      window.location.href = "index.html";
+    });
+</script>
 
 </body>
 </html>
