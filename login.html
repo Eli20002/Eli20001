@@ -28,7 +28,7 @@
     .container {
       width: 100%;
       max-width: 430px;
-      background: white;
+      background: #fff;
       padding: 30px 25px;
       border-radius: 18px;
       box-shadow: 0 8px 30px rgba(0,0,0,.08);
@@ -87,12 +87,14 @@
 
     button:disabled {
       opacity: .6;
+      cursor: not-allowed;
     }
 
     #message {
       text-align: center;
       margin-top: 15px;
       line-height: 1.5;
+      font-size: 15px;
     }
 
     .bottom {
@@ -129,6 +131,7 @@
       id="email"
       type="email"
       placeholder="Enter your email"
+      autocomplete="email"
       required
     >
 
@@ -138,6 +141,7 @@
       id="password"
       type="password"
       placeholder="Enter your password"
+      autocomplete="current-password"
       required
     >
 
@@ -157,9 +161,10 @@
 </div>
 
 <script>
-  // ================================
-  // SOMCHAT SUPABASE CONFIG
-  // ================================
+
+  // =====================================
+  // SOMCHAT SUPABASE
+  // =====================================
 
   const SUPABASE_URL =
     "https://praguwyyshmhmmowofqv.supabase.co";
@@ -173,12 +178,19 @@
       SUPABASE_KEY
     );
 
-  // ================================
-  // LOGIN
-  // ================================
+
+  // =====================================
+  // ELEMENTS
+  // =====================================
 
   const form =
     document.getElementById("loginForm");
+
+  const emailInput =
+    document.getElementById("email");
+
+  const passwordInput =
+    document.getElementById("password");
 
   const message =
     document.getElementById("message");
@@ -186,68 +198,103 @@
   const button =
     document.getElementById("loginButton");
 
+
+  // =====================================
+  // LOGIN
+  // =====================================
+
   form.addEventListener("submit", async function(event) {
 
     event.preventDefault();
 
     const email =
-      document.getElementById("email")
-        .value
-        .trim();
+      emailInput.value.trim().toLowerCase();
 
     const password =
-      document.getElementById("password")
-        .value;
+      passwordInput.value;
 
     message.textContent = "";
     message.style.color = "#555";
+
+    if (!email || !password) {
+
+      message.style.color = "#d9534f";
+
+      message.textContent =
+        "Please enter your email and password.";
+
+      return;
+    }
 
     button.disabled = true;
     button.textContent = "Logging in...";
 
     try {
 
-      const {
-        data,
-        error
-      } = await supabaseClient.auth.signInWithPassword({
-        email: email,
-        password: password
-      });
+      const result =
+        await supabaseClient.auth.signInWithPassword({
+          email: email,
+          password: password
+        });
+
+      const data = result.data;
+      const error = result.error;
 
       if (error) {
         throw error;
       }
 
-      if (!data.user) {
+      if (!data || !data.user) {
         throw new Error("Login failed.");
       }
 
       message.style.color = "#087f5b";
+
       message.textContent =
-        "Login successful!";
+        "✅ Login successful!";
 
       setTimeout(function() {
+
         window.location.href = "chat.html";
+
       }, 800);
 
     } catch (error) {
 
-      console.error(error);
+      console.error(
+        "LOGIN ERROR:",
+        error
+      );
 
       message.style.color = "#d9534f";
 
-      message.textContent =
-        error.message ||
-        "Email or password is incorrect.";
+      if (
+        error.message ===
+        "Invalid login credentials"
+      ) {
+
+        message.textContent =
+          "❌ Email or password is incorrect.";
+
+      } else {
+
+        message.textContent =
+          "❌ " +
+          (error.message ||
+          "Login failed.");
+
+      }
 
     } finally {
 
       button.disabled = false;
+
       button.textContent = "Login";
+
     }
 
   });
+
 </script>
 
 </body>
