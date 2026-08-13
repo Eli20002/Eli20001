@@ -6,6 +6,8 @@
 
   <title>Profile | SomChat</title>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
   <style>
     * {
       box-sizing: border-box;
@@ -41,8 +43,9 @@
     }
 
     .container {
+      width: 100%;
       max-width: 500px;
-      margin: 35px auto;
+      margin: 30px auto;
       padding: 20px;
     }
 
@@ -50,7 +53,7 @@
       background: white;
       border-radius: 18px;
       padding: 30px 25px;
-      box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+      box-shadow: 0 8px 30px rgba(0,0,0,.08);
       text-align: center;
     }
 
@@ -63,9 +66,9 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      margin: 0 auto 18px;
       font-size: 40px;
       font-weight: bold;
-      margin: 0 auto 18px;
     }
 
     h1 {
@@ -97,6 +100,7 @@
     .value {
       font-size: 17px;
       font-weight: bold;
+      word-break: break-word;
     }
 
     .buttons {
@@ -109,11 +113,11 @@
       flex: 1;
       padding: 13px;
       border-radius: 10px;
-      text-decoration: none;
-      font-weight: bold;
-      border: none;
-      cursor: pointer;
       font-size: 15px;
+      font-weight: bold;
+      cursor: pointer;
+      text-decoration: none;
+      border: none;
     }
 
     .chat-btn {
@@ -126,9 +130,14 @@
       color: #333;
     }
 
+    #message {
+      margin-top: 15px;
+      text-align: center;
+    }
+
     @media (max-width: 550px) {
       .container {
-        margin: 20px auto;
+        margin-top: 15px;
       }
     }
   </style>
@@ -137,11 +146,15 @@
 <body>
 
 <header>
-  <div class="logo">💬 SomChat</div>
+
+  <div class="logo">
+    💬 SomChat
+  </div>
 
   <a href="chat.html">
     Chat
   </a>
+
 </header>
 
 <div class="container">
@@ -153,7 +166,7 @@
     </div>
 
     <h1 id="username">
-      SomChat User
+      Loading...
     </h1>
 
     <div class="status">
@@ -163,53 +176,209 @@
     <div class="info">
 
       <div class="row">
-        <div class="label">Username</div>
+
+        <div class="label">
+          Username
+        </div>
+
         <div class="value" id="usernameInfo">
-          SomChat User
+          Loading...
         </div>
+
       </div>
 
       <div class="row">
-        <div class="label">Email</div>
+
+        <div class="label">
+          Email
+        </div>
+
         <div class="value" id="emailInfo">
-          user@example.com
+          Loading...
         </div>
+
       </div>
 
       <div class="row">
-        <div class="label">Country</div>
-        <div class="value">
+
+        <div class="label">
+          Country
+        </div>
+
+        <div class="value" id="countryInfo">
           Somalia 🇸🇴
         </div>
+
       </div>
 
     </div>
 
     <div class="buttons">
 
-      <a href="chat.html" class="btn chat-btn">
+      <a
+        href="chat.html"
+        class="btn chat-btn"
+      >
         💬 Open Chat
       </a>
 
-      <button class="btn logout-btn" id="logout">
+      <button
+        id="logout"
+        class="btn logout-btn"
+      >
         Logout
       </button>
 
     </div>
+
+    <div id="message"></div>
 
   </div>
 
 </div>
 
 <script>
+
+  // ================================
+  // SUPABASE
+  // ================================
+
+  const SUPABASE_URL =
+    "https://praguwyyshmhmmowofqv.supabase.co";
+
+  const SUPABASE_KEY =
+    "sb_publishable_JPzVvllEgAUcBD_ahGZR6g_Z2rrzRDW";
+
+  const supabaseClient =
+    window.supabase.createClient(
+      SUPABASE_URL,
+      SUPABASE_KEY
+    );
+
+
+  // ================================
+  // LOAD PROFILE
+  // ================================
+
+  async function loadProfile() {
+
+    const {
+      data: authData,
+      error: authError
+    } = await supabaseClient.auth.getUser();
+
+    if (authError || !authData.user) {
+
+      window.location.href =
+        "login.html";
+
+      return;
+    }
+
+    const user =
+      authData.user;
+
+
+    const {
+      data: profile,
+      error
+    } = await supabaseClient
+      .from("profiles")
+      .select(
+        "username, email, country"
+      )
+      .eq("id", user.id)
+      .single();
+
+
+    if (error) {
+
+      console.error(error);
+
+      document.getElementById(
+        "message"
+      ).textContent =
+        "Could not load profile.";
+
+      return;
+    }
+
+
+    const username =
+      profile.username || "SomChat User";
+
+    const email =
+      profile.email || user.email || "";
+
+    const country =
+      profile.country || "Somalia";
+
+
+    document.getElementById(
+      "username"
+    ).textContent = username;
+
+
+    document.getElementById(
+      "usernameInfo"
+    ).textContent = username;
+
+
+    document.getElementById(
+      "emailInfo"
+    ).textContent = email;
+
+
+    document.getElementById(
+      "countryInfo"
+    ).textContent =
+      country + " 🇸🇴";
+
+
+    document.getElementById(
+      "avatar"
+    ).textContent =
+      username.charAt(0).toUpperCase();
+
+  }
+
+
+  // ================================
+  // LOGOUT
+  // ================================
+
   document
     .getElementById("logout")
-    .addEventListener("click", function() {
+    .addEventListener(
+      "click",
+      async function() {
 
-      alert("Logout will be connected to Supabase next.");
+        const {
+          error
+        } = await supabaseClient
+          .auth
+          .signOut();
 
-      window.location.href = "index.html";
-    });
+        if (error) {
+
+          document.getElementById(
+            "message"
+          ).textContent =
+            error.message;
+
+          return;
+        }
+
+        window.location.href =
+          "login.html";
+
+      }
+    );
+
+
+  // Start
+  loadProfile();
+
 </script>
 
 </body>
