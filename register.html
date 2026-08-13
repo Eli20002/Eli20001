@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <title>Create Account | SomChat</title>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -10,45 +11,52 @@
   <style>
     * {
       box-sizing: border-box;
+      margin: 0;
+      padding: 0;
       font-family: Arial, sans-serif;
     }
 
     body {
-      margin: 0;
       background: #f2f5f8;
       min-height: 100vh;
       display: flex;
-      align-items: center;
       justify-content: center;
+      align-items: center;
       padding: 20px;
     }
 
-    .box {
+    .container {
       width: 100%;
-      max-width: 420px;
+      max-width: 430px;
       background: white;
       padding: 30px 25px;
       border-radius: 18px;
-      box-shadow: 0 8px 30px rgba(0,0,0,.08);
+      box-shadow: 0 8px 30px rgba(0,0,0,0.08);
     }
 
     .logo {
       text-align: center;
-      color: #087f5b;
       font-size: 30px;
       font-weight: bold;
-      margin-bottom: 10px;
+      color: #087f5b;
+      margin-bottom: 8px;
     }
 
     h2 {
       text-align: center;
+      margin-bottom: 8px;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #777;
       margin-bottom: 25px;
     }
 
     label {
       display: block;
+      margin-bottom: 7px;
       font-weight: bold;
-      margin: 14px 0 7px;
     }
 
     input {
@@ -56,19 +64,29 @@
       padding: 13px;
       border: 1px solid #ddd;
       border-radius: 10px;
+      margin-bottom: 15px;
       font-size: 16px;
+      outline: none;
+    }
+
+    input:focus {
+      border-color: #087f5b;
     }
 
     button {
       width: 100%;
-      margin-top: 22px;
       padding: 14px;
-      border: 0;
+      border: none;
       border-radius: 10px;
       background: #087f5b;
       color: white;
       font-size: 17px;
       font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:disabled {
+      opacity: 0.6;
     }
 
     #message {
@@ -80,53 +98,62 @@
     .bottom {
       text-align: center;
       margin-top: 20px;
+      color: #777;
     }
 
-    a {
+    .bottom a {
       color: #087f5b;
-      font-weight: bold;
       text-decoration: none;
+      font-weight: bold;
     }
   </style>
 </head>
 
 <body>
 
-<div class="box">
+<div class="container">
 
   <div class="logo">💬 SomChat</div>
 
   <h2>Create Account</h2>
 
+  <p class="subtitle">
+    Join SomChat today
+  </p>
+
   <form id="registerForm">
 
-    <label>Username</label>
+    <label for="username">Username</label>
+
     <input
-      id="username"
       type="text"
+      id="username"
       placeholder="Enter username"
       minlength="3"
+      maxlength="30"
       required
     >
 
-    <label>Email</label>
+    <label for="email">Email</label>
+
     <input
-      id="email"
       type="email"
+      id="email"
       placeholder="Enter email"
       required
     >
 
-    <label>Password</label>
+    <label for="password">Password</label>
+
     <input
-      id="password"
       type="password"
+      id="password"
       placeholder="Minimum 6 characters"
       minlength="6"
       required
     >
 
-    <button type="submit">
+    <button id="registerButton" type="submit">
       Create Account
     </button>
 
@@ -142,29 +169,78 @@
 </div>
 
 <script>
-  const SUPABASE_URL = "GELI_URL_KA_SOMCHAT";
-  const SUPABASE_KEY = "GELI_PUBLISHABLE_KEY_KA_SOMCHAT";
+  // ================================
+  // SOMCHAT SUPABASE CONFIG
+  // ================================
 
-  const supabaseClient = window.supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_KEY
-  );
+  const SUPABASE_URL =
+    "https://praguwyyshmhmmowofqv.supabase.co";
 
-  const form = document.getElementById("registerForm");
-  const message = document.getElementById("message");
+  const SUPABASE_KEY =
+    "sb_publishable_JPzVvllEgAUcBD_ahGZR6g_Z2rrzRDW";
+
+  const supabaseClient =
+    window.supabase.createClient(
+      SUPABASE_URL,
+      SUPABASE_KEY
+    );
+
+  // ================================
+  // REGISTER
+  // ================================
+
+  const form =
+    document.getElementById("registerForm");
+
+  const message =
+    document.getElementById("message");
+
+  const button =
+    document.getElementById("registerButton");
 
   form.addEventListener("submit", async function(event) {
+
     event.preventDefault();
 
-    const username = document.getElementById("username").value.trim();
-    const email = document.getElementById("email").value.trim();
-    const password = document.getElementById("password").value;
+    const username =
+      document.getElementById("username")
+        .value
+        .trim();
 
+    const email =
+      document.getElementById("email")
+        .value
+        .trim();
+
+    const password =
+      document.getElementById("password")
+        .value;
+
+    message.textContent = "";
     message.style.color = "#555";
-    message.textContent = "Creating account...";
+
+    if (username.length < 3) {
+      message.textContent =
+        "Username must be at least 3 characters.";
+      return;
+    }
+
+    if (password.length < 6) {
+      message.textContent =
+        "Password must be at least 6 characters.";
+      return;
+    }
+
+    button.disabled = true;
+    button.textContent = "Creating account...";
 
     try {
-      const { data, error } = await supabaseClient.auth.signUp({
+
+      // Create Supabase Auth account
+      const {
+        data,
+        error
+      } = await supabaseClient.auth.signUp({
         email: email,
         password: password
       });
@@ -174,35 +250,18 @@
       }
 
       if (!data.user) {
-        throw new Error("Account could not be created.");
+        throw new Error(
+          "Account could not be created."
+        );
       }
 
-      const { error: profileError } = await supabaseClient
+      // Create profile
+      const {
+        error: profileError
+      } = await supabaseClient
         .from("profiles")
         .insert({
           id: data.user.id,
           username: username,
           email: email,
-          country: "Somalia"
-        });
-
-      if (profileError) {
-        throw profileError;
-      }
-
-      message.style.color = "#087f5b";
-      message.textContent =
-        "Account created successfully! You can now login.";
-
-      form.reset();
-
-    } catch (error) {
-
-      message.style.color = "#d9534f";
-      message.textContent = error.message;
-    }
-  });
-</script>
-
-</body>
-</html>
+          country: "Som
