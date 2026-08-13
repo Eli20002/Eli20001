@@ -2,11 +2,11 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>SomChat - Register</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase.js"></script>
 
 <style>
 *{
@@ -117,46 +117,40 @@ Ku biir SomChat
 <form id="form">
 
 <label>Username</label>
-
 <input
-id="username"
-type="text"
-placeholder="Username"
-minlength="3"
-maxlength="30"
-required
+  id="username"
+  type="text"
+  minlength="3"
+  maxlength="30"
+  placeholder="Username"
+  required
 >
 
 <label>Email</label>
-
 <input
-id="email"
-type="email"
-placeholder="Email"
-required
+  id="email"
+  type="email"
+  placeholder="Email"
+  required
 >
 
 <label>Password</label>
-
 <input
-id="password"
-type="password"
-placeholder="Password"
-minlength="6"
-required
+  id="password"
+  type="password"
+  minlength="6"
+  placeholder="Password"
+  required
 >
 
 <label>Country</label>
-
 <input
-id="country"
-type="text"
-placeholder="Somalia"
+  id="country"
+  type="text"
+  placeholder="Somalia"
 >
 
-<button
-id="button"
-type="submit">
+<button id="button" type="submit">
 Create Account
 </button>
 
@@ -173,19 +167,6 @@ Already have an account?
 
 <script>
 
-const SUPABASE_URL =
-"https://praguwyyshmhmmowofqv.supabase.co";
-
-const SUPABASE_ANON_KEY =
-"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzIiwicmVmIjoicHJhZ3V3eXNobWhtbW93ZnF2Iiwicm9sIjoiYW5vbiIsImlhdCI6MTc4NjU3MDc2NiwiZXhwIjoyMTAyMTQ2NzY2fQ.oJjsk_93uBMLeT-8ydDeecJBpcKI4IwTZaVmDU0t-fk";
-
-const supabaseClient =
-window.supabase.createClient(
-  SUPABASE_URL,
-  SUPABASE_ANON_KEY
-);
-
-
 const form =
 document.getElementById("form");
 
@@ -195,154 +176,117 @@ document.getElementById("button");
 const result =
 document.getElementById("result");
 
-
 form.addEventListener(
 "submit",
 async function(e){
 
-e.preventDefault();
+  e.preventDefault();
 
-const username =
-document.getElementById("username")
-.value.trim();
+  const username =
+    document.getElementById("username")
+    .value.trim();
 
-const email =
-document.getElementById("email")
-.value.trim();
+  const email =
+    document.getElementById("email")
+    .value.trim();
 
-const password =
-document.getElementById("password")
-.value;
+  const password =
+    document.getElementById("password")
+    .value;
 
-const country =
-document.getElementById("country")
-.value.trim();
+  const country =
+    document.getElementById("country")
+    .value.trim();
 
+  if(username.length < 3){
 
-if(username.length < 3){
+    result.innerHTML =
+      "❌ Username ugu yaraan 3 xaraf.";
 
-result.innerHTML =
-"❌ Username waa inuu ugu yaraan 3 xaraf ahaadaa.";
+    return;
+  }
 
-return;
-}
+  button.disabled = true;
+  button.textContent = "Creating...";
 
+  result.innerHTML = "";
 
-button.disabled=true;
+  try{
 
-button.textContent=
-"Creating...";
+    const { data: existing, error: checkError } =
+      await supabaseClient
+      .from("profiles")
+      .select("id")
+      .eq("username",username)
+      .maybeSingle();
 
-result.innerHTML="";
+    if(checkError)
+      throw checkError;
 
+    if(existing){
 
-try{
+      result.innerHTML =
+        "❌ Username-kan hore ayaa loo isticmaalay.";
 
-/* Check username */
+      button.disabled = false;
+      button.textContent = "Create Account";
 
-const {
-data:existing,
-error:checkError
-} =
-await supabaseClient
-.from("profiles")
-.select("id")
-.eq("username",username)
-.maybeSingle();
+      return;
+    }
 
+    const {
+      data,
+      error
+    } =
+      await supabaseClient.auth.signUp({
 
-if(checkError)
-throw checkError;
+        email:email,
 
+        password:password,
 
-if(existing){
+        options:{
+          data:{
+            username:username,
+            country:country
+          }
+        }
 
-result.innerHTML=
-"❌ Username-kan hore ayaa loo isticmaalay.";
+      });
 
-button.disabled=false;
+    if(error)
+      throw error;
 
-button.textContent=
-"Create Account";
+    if(!data.user)
+      throw new Error("Account lama samayn.");
 
-return;
-}
+    result.innerHTML =
+      "✅ Account waa la sameeyay!<br>" +
+      "Hadda Login samee.";
 
+    form.reset();
 
-/* CREATE AUTH ACCOUNT */
+    button.disabled = false;
+    button.textContent = "Create Account";
 
-const {
-data,
-error
-} =
-await supabaseClient.auth.signUp({
+    setTimeout(function(){
 
-email:email,
+      location.href="login.html";
 
-password:password,
+    },2000);
 
-options:{
-data:{
-username:username,
-country:country
-}
-}
+  }
+  catch(error){
 
-});
+    console.error(error);
 
+    result.innerHTML =
+      "❌ " + error.message;
 
-if(error)
-throw error;
+    button.disabled = false;
+    button.textContent =
+      "Create Account";
 
-
-if(!data.user){
-
-throw new Error(
-"Account lama samayn."
-);
-
-}
-
-
-/* SUCCESS */
-
-result.innerHTML=
-"✅ Account waa la sameeyay!<br><br>"+
-"Waxaad hadda Login samayn kartaa.";
-
-
-form.reset();
-
-button.disabled=false;
-
-button.textContent=
-"Create Account";
-
-
-setTimeout(
-function(){
-
-window.location.href=
-"login.html";
-
-},
-2000
-);
-
-
-}catch(error){
-
-console.error(error);
-
-result.innerHTML=
-"❌ "+error.message;
-
-button.disabled=false;
-
-button.textContent=
-"Create Account";
-
-}
+  }
 
 });
 
