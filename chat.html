@@ -3,115 +3,46 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
   <title>SomChat</title>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: Arial, sans-serif;
-    }
-
     body {
+      margin: 0;
+      font-family: Arial, sans-serif;
       background: #f2f5f8;
-      height: 100vh;
-      overflow: hidden;
     }
 
     header {
-      height: 65px;
       background: #087f5b;
       color: white;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 18px;
-    }
-
-    .logo {
-      font-size: 23px;
-      font-weight: bold;
-    }
-
-    .header-links {
-      display: flex;
-      gap: 15px;
-    }
-
-    .header-links a {
-      color: white;
-      text-decoration: none;
-      font-weight: bold;
-    }
-
-    .layout {
-      height: calc(100vh - 65px);
-      display: flex;
-    }
-
-    .users {
-      width: 280px;
-      background: white;
-      border-right: 1px solid #ddd;
-      overflow-y: auto;
-    }
-
-    .users-title {
       padding: 18px;
-      font-size: 20px;
+      text-align: center;
+      font-size: 24px;
       font-weight: bold;
     }
 
-    .user {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 13px 16px;
-      border-top: 1px solid #eee;
-      cursor: pointer;
+    .welcome {
+      text-align: center;
+      padding: 50px 20px;
     }
 
-    .user:hover {
-      background: #f4f8f6;
+    .welcome h1 {
+      color: #087f5b;
     }
+  </style>
+</head>
 
-    .user.active {
-      background: #eaf6f1;
-    }
+<body>
 
-    .avatar {
-      width: 45px;
-      height: 45px;
-      border-radius: 50%;
-      background: #087f5b;
-      color: white;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-weight: bold;
-    }
+<header>
+  💬 SomChat
+</header>
 
-    .username {
-      font-weight: bold;
-    }
+<div class="welcome">
+  <h1>Welcome to SomChat 🎉</h1>
+  <p>Login-ka wuu shaqeeyay!</p>
+  <p>SomChat ayaa diyaar ah.</p>
+</div>
 
-    .country {
-      color: #777;
-      font-size: 13px;
-      margin-top: 4px;
-    }
-
-    .chat {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .chat-header {
-      height: 65px;
-      background: white;
-      border-bottom: 
+</body>
+</html>
