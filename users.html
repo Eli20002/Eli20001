@@ -1,1 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+  <title>SomChat - Users</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background: #f1f5f9;
+      min-height: 100vh;
+    }
+
+    header {
+      background: #075e54;
+      color: white;
+      padding: 16px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .header-inner {
+      max-width: 700px;
+      margin: auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo {
+      font-size: 22px;
+      font-weight: bold;
+    }
+
+    #logout {
+      border: 0;
+      background: #dc2626;
+      color: white;
+      padding: 9px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    main {
+      width: 100%;
+      max-width: 700px;
+      margin: auto;
+      padding: 20px 15px;
+    }
+
+    #search {
+      width: 100%;
+      padding: 15px 18px;
+      border: 1px solid #d1d5db;
+      border-radius: 14px;
+      background: white;
+      font-size: 16px;
+      outline: none;
+      margin-bottom: 15px;
+    }
+
+    #search:focus {
+      border-color: #128c7e;
+    }
+
+    #status {
+      text-align: center;
+      color: #64748b;
+      margin: 12px 0;
+      font-size: 14px;
+    }
+
+    #users {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .user-card {
+      background: white;
+      border-radius: 15px;
+      padding: 13px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,.06);
+    }
+
+    .avatar {
+      width: 54px;
+      height: 54px;
+      min-width: 54px;
+      border-radius: 50%;
+      background: #128c7e;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      font-size: 24px;
+    }
+
+    .avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .username {
+      font-size: 17px;
+      font-weight: bold;
+      color: #111827;
+    }
+
+    .country {
+      color: #64748b;
+      font-size: 13px;
+      margin-top: 3px;
+    }
+
+    .status {
+      font-size: 13px;
+      margin-top: 4px;
+    }
+
+    .online {
+      color: #16a34a;
+    }
+
+    .offline {
+      color: #94a3b8;
+    }
+
+    .chat-btn {
+      border: 0;
+      background: #25d366;
+      color: white;
+      font-weight: bold;
+      padding: 10px 14px;
+      border-radius: 9px;
+      cursor: pointer;
+    }
+
+    .empty {
+      background: white;
+      border-radius: 15px;
+      padding: 30px;
+      text-align: center;
+      color: #64748b;
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="logo">💬 SomChat</div>
+
+    <button id="logout">
+      Logout
+    </button>
+  </div>
+</header>
+
+<main>
+
+  <input
+    id="search"
+    type="search"
+    placeholder="🔎 Search username..."
+    autocomplete="off"
+  >
+
+  <div id="status">
+    Loading users...
+  </div>
+
+  <div id="users"></div>
+
+</main>
+
+<script>
+
+// ========================================
+// SUPABASE CONNECTION
+// ========================================
+
+const SUPABASE_URL =
+  "https://praguwyyshmhmmowofqv.supabase.co";
+
+const SUPABASE_ANON_KEY =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InByYWd1d3l5c2htaG1tb3dvZnF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY1NzA3NjYsImV4cCI6MjEwMjE0Njc2Nn0.oJjsk_93uBMLeT-8ydDeecJBpcKI4IwTZaVmDU0t-fk";
+
+const supabaseClient =
+  window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_ANON_KEY
+  );
+
+
+// ========================================
+// VARIABLES
+// ========================================
+
+let currentUser = null;
+let allUsers = [];
+
+
+// ========================================
+// CHECK LOGIN
+// ========================================
+
+async function start() {
+
+  const {
+    data,
+    error
+  } = await supabaseClient.auth.getUser();
+
+  if (error || !data.user) {
+
+    window.location.href =
+      "login.html";
+
+    return;
+  }
+
+  currentUser = data.user;
+
+  await setOnline();
+
+  await loadUsers();
+
+  startRealtime();
+
+}
+
+
+// ========================================
+// SET ONLINE
+// ========================================
+
+async function setOnline() {
+
+  const { error } =
+    await supabaseClient
+      .from("profiles")
+      .update({
+        online: true,
+        last_seen: new Date().toISOString()
+      })
+      .eq("id", currentUser.id);
+
+  if (error) {
+    console.log(error);
+  }
+}
+
+
+// ========================================
+// LOAD USERS
+// ========================================
+
+async function loadUsers() {
+
+  const {
+    data,
+    error
+  } = await supabaseClient
+    .from("profiles")
+    .select(`
+      id,
+      username,
+      country,
+      bio,
+      avatar_url,
+      online,
+      last_seen
+    `)
+    .neq("id", currentUser.id)
+    .order("username", {
+      ascending: true
+    });
+
+
+  if (error) {
+
+    console.error(error);
+
+    document.getElementById("status")
+      .textContent =
+      "❌ " + error.message;
+
+    return;
+  }
+
+
+  allUsers = data || [];
+
+  displayUsers(allUsers);
+
+}
+
+
+// ========================================
+// DISPLAY USERS
+// ========================================
+
+function displayUsers(users) {
+
+  const container =
+    document.getElementById("users");
+
+  const status =
+    document.getElementById("status");
+
+  container.innerHTML = "";
+
+
+  status.textContent =
+    users.length +
+    (users.length === 1
+      ? " user"
+      : " users");
+
+
+  if (users.length === 0) {
+
+    container.innerHTML = `
+      <div class="empty">
+        👥 No users found
+      </div>
+    `;
+
+    return;
+  }
+
+
+  users.forEach(user => {
+
+    const card =
+      document.createElement("div");
+
+    card.className =
+      "user-card";
+
+
+    // Avatar
+    const avatar =
+      document.createElement("div");
+
+    avatar.className =
+      "avatar";
+
+
+    if (user.avatar_url) {
+
+      const img =
+        document.createElement("img");
+
+      img.src =
+        user.avatar_url;
+
+      img.alt =
+        user.username;
+
+      avatar.appendChild(img);
+
+    } else {
+
+      avatar.textContent =
+        "👤";
+
+    }
+
+
+    // Info
+    const info =
+      document.createElement("div");
+
+    info.className =
+      "info";
+
+
+    const username =
+      document.createElement("div");
+
+    username.className =
+      "username";
+
+    username.textContent =
+      user.username || "User";
+
+
+    const country =
+      document.createElement("div");
+
+    country.className =
+      "country";
+
+    country.textContent =
+      user.country
+        ? "🌍 " + user.country
+        : "";
+
+
+    const online =
+      document.createElement("div");
+
+    online.className =
+      "status " +
+      (user.online
+        ? "online"
+        : "offline");
+
+    online.textContent =
+      user.online
+        ? "● Online"
+        : "● Offline";
+
+
+    info.appendChild(username);
+    info.appendChild(country);
+    info.appendChild(online);
+
+
+    // Chat
+    const button =
+      document.createElement("button");
+
+    button.className =
+      "chat-btn";
+
+    button.textContent =
+      "💬 Chat";
+
+
+    button.onclick = function() {
+
+      window.location.href =
+        "chat.html?user=" +
+        encodeURIComponent(user.id);
+
+    };
+
+
+    card.appendChild(avatar);
+    card.appendChild(info);
+    card.appendChild(button);
+
+    container.appendChild(card);
+
+  });
+
+}
+
+
+// ========================================
+// SEARCH
+// ========================================
+
+document
+  .getElementById("search")
+  .addEventListener(
+    "input",
+    function() {
+
+      const value =
+        this.value
+          .trim()
+          .toLowerCase();
+
+
+      if (!value) {
+
+        displayUsers(allUsers);
+
+        return;
+      }
+
+
+      const filtered =
+        allUsers.filter(user => {
+
+          const username =
+            (user.username || "")
+              .toLowerCase();
+
+          const country =
+            (user.country || "")
+              .toLowerCase();
+
+          return (
+            username.includes(value) ||
+            country.includes(value)
+          );
+
+        });
+
+
+      displayUsers(filtered);
+
+    }
+  );
+
+
+// ========================================
+// REALTIME
+// ========================================
+
+function startRealtime() {
+
+  supabaseClient
+    .channel("profiles-realtime")
+    .on(
+      "postgres_changes",
+      {
+        event: "*",
+        schema: "public",
+        table: "profiles"
+      },
+      function() {
+
+        loadUsers();
+
+      }
+    )
+    .subscribe();
+
+}
+
+
+// ========================================
+// LOGOUT
+// ========================================
+
+document
+  .getElementById("logout")
+  .addEventListener(
+    "click",
+    async function() {
+
+      if (currentUser) {
+
+        await supabaseClient
+          .from("profiles")
+          .update({
+            online: false,
+            last_seen: new Date().toISOString()
+          })
+          .eq("id", currentUser.id);
+
+      }
+
+
+      await supabaseClient.auth.signOut();
+
+      window.location.href =
+        "login.html";
+
+    }
+  );
+
+
+// ========================================
+// START APP
+// ========================================
+
+start();
+
+</script>
+
+</body>
+</html>
