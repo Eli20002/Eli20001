@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Chat | SomChat</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background: #f2f5f8;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .app {
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      height: 65px;
+      background: #087f5b;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 18px;
+    }
+
+    .logo {
+      font-size: 23px;
+      font-weight: bold;
+    }
+
+    .profile {
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .content {
+      flex: 1;
+      display: flex;
+      overflow: hidden;
+    }
+
+    .users {
+      width: 280px;
+      background: white;
+      border-right: 1px solid #ddd;
+      overflow-y: auto;
+    }
+
+    .users-title {
+      padding: 18px;
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    .user {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 13px 16px;
+      cursor: pointer;
+      border-top: 1px solid #f1f1f1;
+    }
+
+    .user:hover {
+      background: #f4f8f6;
+    }
+
+    .avatar {
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      background: #087f5b;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+    }
+
+    .user-name {
+      font-weight: bold;
+    }
+
+    .online {
+      color: #087f5b;
+      font-size: 13px;
+      margin-top: 4px;
+    }
+
+    .chat {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .chat-header {
+      background: white;
+      padding: 15px 18px;
+      border-bottom: 1px solid #ddd;
+      font-weight: bold;
+    }
+
+    .messages {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+    }
+
+    .message {
+      max-width: 75%;
+      padding: 11px 14px;
+      border-radius: 15px;
+      margin-bottom: 10px;
+      line-height: 1.4;
+    }
+
+    .received {
+      background: white;
+      margin-right: auto;
+    }
+
+    .sent {
+      background: #087f5b;
+      color: white;
+      margin-left: auto;
+    }
+
+    .input-area {
+      background: white;
+      padding: 12px;
+      display: flex;
+      gap: 10px;
+      border-top: 1px solid #ddd;
+    }
+
+    .input-area input {
+      flex: 1;
+      padding: 13px;
+      border: 1px solid #ddd;
+      border-radius: 25px;
+      outline: none;
+      font-size: 16px;
+    }
+
+    .send {
+      border: none;
+      background: #087f5b;
+      color: white;
+      width: 50px;
+      border-radius: 50%;
+      font-size: 18px;
+      cursor: pointer;
+    }
+
+    @media (max-width: 650px) {
+      .users {
+        width: 90px;
+      }
+
+      .users-title {
+        font-size: 15px;
+        padding: 12px;
+      }
+
+      .user {
+        justify-content: center;
+        padding: 12px 5px;
+      }
+
+      .user-info {
+        display: none;
+      }
+
+      .avatar {
+        width: 42px;
+        height: 42px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="app">
+
+  <header>
+    <div class="logo">💬 SomChat</div>
+
+    <a href="profile.html" class="profile">
+      Profile
+    </a>
+  </header>
+
+  <div class="content">
+
+    <aside class="users">
+
+      <div class="users-title">
+        Chats
+      </div>
+
+      <div class="user">
+        <div class="avatar">A</div>
+
+        <div class="user-info">
+          <div class="user-name">Abdi</div>
+          <div class="online">● Online</div>
+        </div>
+      </div>
+
+      <div class="user">
+        <div class="avatar">H</div>
+
+        <div class="user-info">
+          <div class="user-name">Hassan</div>
+          <div class="online">● Online</div>
+        </div>
+      </div>
+
+      <div class="user">
+        <div class="avatar">M</div>
+
+        <div class="user-info">
+          <div class="user-name">Mohamed</div>
+          <div class="online">● Online</div>
+        </div>
+      </div>
+
+    </aside>
+
+    <section class="chat">
+
+      <div class="chat-header">
+        💬 Abdi
+      </div>
+
+      <div class="messages" id="messages">
+
+        <div class="message received">
+          Salaam 👋
+        </div>
+
+        <div class="message received">
+          Welcome to SomChat!
+        </div>
+
+      </div>
+
+      <form class="input-area" id="chatForm">
+
+        <input
+          type="text"
+          id="messageInput"
+          placeholder="Write a message..."
+          autocomplete="off"
+          required
+        >
+
+        <button class="send" type="submit">
+          ➤
+        </button>
+
+      </form>
+
+    </section>
+
+  </div>
+
+</div>
+
+<script>
+  const form = document.getElementById("chatForm");
+  const input = document.getElementById("messageInput");
+  const messages = document.getElementById("messages");
+
+  form.addEventListener("submit", function(event) {
+
+    event.preventDefault();
+
+    const text = input.value.trim();
+
+    if (!text) return;
+
+    const message = document.createElement("div");
+
+    message.className = "message sent";
+
+    message.textContent = text;
+
+    messages.appendChild(message);
+
+    input.value = "";
+
+    messages.scrollTop = messages.scrollHeight;
+  });
+</script>
+
+</body>
+</html>
