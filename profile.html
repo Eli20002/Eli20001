@@ -118,6 +118,7 @@
       cursor: pointer;
       text-decoration: none;
       border: none;
+      text-align: center;
     }
 
     .chat-btn {
@@ -133,12 +134,7 @@
     #message {
       margin-top: 15px;
       text-align: center;
-    }
-
-    @media (max-width: 550px) {
-      .container {
-        margin-top: 15px;
-      }
+      color: #d9534f;
     }
   </style>
 </head>
@@ -176,39 +172,27 @@
     <div class="info">
 
       <div class="row">
-
-        <div class="label">
-          Username
-        </div>
+        <div class="label">Username</div>
 
         <div class="value" id="usernameInfo">
           Loading...
         </div>
-
       </div>
 
       <div class="row">
-
-        <div class="label">
-          Email
-        </div>
+        <div class="label">Email</div>
 
         <div class="value" id="emailInfo">
           Loading...
         </div>
-
       </div>
 
       <div class="row">
-
-        <div class="label">
-          Country
-        </div>
+        <div class="label">Country</div>
 
         <div class="value" id="countryInfo">
           Somalia 🇸🇴
         </div>
-
       </div>
 
     </div>
@@ -239,145 +223,146 @@
 
 <script>
 
-  // ================================
-  // SUPABASE
-  // ================================
+const SUPABASE_URL =
+  "https://praguwyyshmhmmowofqv.supabase.co";
 
-  const SUPABASE_URL =
-    "https://praguwyyshmhmmowofqv.supabase.co";
+const SUPABASE_KEY =
+  "sb_publishable_JPzVvllEgAUcBD_ahGZR6g_Z2rrzRDW";
 
-  const SUPABASE_KEY =
-    "sb_publishable_JPzVvllEgAUcBD_ahGZR6g_Z2rrzRDW";
-
-  const supabaseClient =
-    window.supabase.createClient(
-      SUPABASE_URL,
-      SUPABASE_KEY
-    );
+const supabaseClient =
+  window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+  );
 
 
-  // ================================
-  // LOAD PROFILE
-  // ================================
+// =====================================
+// LOAD USER
+// =====================================
 
-  async function loadProfile() {
+async function loadProfile() {
 
-    const {
-      data: authData,
-      error: authError
-    } = await supabaseClient.auth.getUser();
+  const {
+    data,
+    error
+  } = await supabaseClient.auth.getUser();
 
-    if (authError || !authData.user) {
+  if (error || !data.user) {
+
+    window.location.href =
+      "login.html";
+
+    return;
+  }
+
+  const user = data.user;
+
+  let username =
+    user.user_metadata?.username ||
+    "SomChat User";
+
+  let email =
+    user.email || "";
+
+  let country =
+    "Somalia";
+
+
+  // =====================================
+  // TRY PROFILES TABLE
+  // =====================================
+
+  const result =
+    await supabaseClient
+      .from("profiles")
+      .select("username,email,country")
+      .eq("id", user.id)
+      .maybeSingle();
+
+
+  if (result.data) {
+
+    username =
+      result.data.username ||
+      username;
+
+    email =
+      result.data.email ||
+      email;
+
+    country =
+      result.data.country ||
+      country;
+  }
+
+
+  // =====================================
+  // SHOW PROFILE
+  // =====================================
+
+  document.getElementById(
+    "username"
+  ).textContent = username;
+
+  document.getElementById(
+    "usernameInfo"
+  ).textContent = username;
+
+  document.getElementById(
+    "emailInfo"
+  ).textContent = email;
+
+  document.getElementById(
+    "countryInfo"
+  ).textContent =
+    country + " 🇸🇴";
+
+  document.getElementById(
+    "avatar"
+  ).textContent =
+    username
+      .charAt(0)
+      .toUpperCase();
+
+}
+
+
+// =====================================
+// LOGOUT
+// =====================================
+
+document
+  .getElementById("logout")
+  .addEventListener(
+    "click",
+    async function() {
+
+      const {
+        error
+      } = await supabaseClient
+        .auth
+        .signOut();
+
+      if (error) {
+
+        document.getElementById(
+          "message"
+        ).textContent =
+          error.message;
+
+        return;
+      }
 
       window.location.href =
         "login.html";
 
-      return;
     }
-
-    const user =
-      authData.user;
+  );
 
 
-    const {
-      data: profile,
-      error
-    } = await supabaseClient
-      .from("profiles")
-      .select(
-        "username, email, country"
-      )
-      .eq("id", user.id)
-      .single();
+// START
 
-
-    if (error) {
-
-      console.error(error);
-
-      document.getElementById(
-        "message"
-      ).textContent =
-        "Could not load profile.";
-
-      return;
-    }
-
-
-    const username =
-      profile.username || "SomChat User";
-
-    const email =
-      profile.email || user.email || "";
-
-    const country =
-      profile.country || "Somalia";
-
-
-    document.getElementById(
-      "username"
-    ).textContent = username;
-
-
-    document.getElementById(
-      "usernameInfo"
-    ).textContent = username;
-
-
-    document.getElementById(
-      "emailInfo"
-    ).textContent = email;
-
-
-    document.getElementById(
-      "countryInfo"
-    ).textContent =
-      country + " 🇸🇴";
-
-
-    document.getElementById(
-      "avatar"
-    ).textContent =
-      username.charAt(0).toUpperCase();
-
-  }
-
-
-  // ================================
-  // LOGOUT
-  // ================================
-
-  document
-    .getElementById("logout")
-    .addEventListener(
-      "click",
-      async function() {
-
-        const {
-          error
-        } = await supabaseClient
-          .auth
-          .signOut();
-
-        if (error) {
-
-          document.getElementById(
-            "message"
-          ).textContent =
-            error.message;
-
-          return;
-        }
-
-        window.location.href =
-          "login.html";
-
-      }
-    );
-
-
-  // Start
-  loadProfile();
+loadProfile();
 
 </script>
 
