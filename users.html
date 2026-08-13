@@ -1,587 +1,331 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
 
-  <title>SomChat - Users</title>
+<title>SomChat - Users</title>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase.js"></script>
 
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: Arial, sans-serif;
-    }
+<style>
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+  font-family:Arial,sans-serif;
+}
 
-    body {
-      background: #f1f5f9;
-      min-height: 100vh;
-    }
+body{
+  background:#f5f7f9;
+}
 
-    header {
-      background: #075e54;
-      color: white;
-      padding: 16px;
-      position: sticky;
-      top: 0;
-      z-index: 10;
-    }
+header{
+  background:#075e54;
+  color:white;
+  padding:18px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
 
-    .header-inner {
-      max-width: 700px;
-      margin: auto;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
+header h1{
+  font-size:22px;
+}
 
-    .logo {
-      font-size: 22px;
-      font-weight: bold;
-    }
+.logout{
+  background:#d32f2f;
+  border:0;
+  color:white;
+  padding:9px 14px;
+  border-radius:8px;
+}
 
-    #logout {
-      border: 0;
-      background: #dc2626;
-      color: white;
-      padding: 9px 14px;
-      border-radius: 8px;
-      cursor: pointer;
-    }
+.search{
+  padding:12px;
+  background:white;
+}
 
-    main {
-      width: 100%;
-      max-width: 700px;
-      margin: auto;
-      padding: 20px 15px;
-    }
+#search{
+  width:100%;
+  padding:13px;
+  border:1px solid #ddd;
+  border-radius:10px;
+  font-size:16px;
+}
 
-    #search {
-      width: 100%;
-      padding: 15px 18px;
-      border: 1px solid #d1d5db;
-      border-radius: 14px;
-      background: white;
-      font-size: 16px;
-      outline: none;
-      margin-bottom: 15px;
-    }
+#users{
+  padding:10px;
+}
 
-    #search:focus {
-      border-color: #128c7e;
-    }
+.user{
+  background:white;
+  margin-bottom:8px;
+  padding:12px;
+  border-radius:12px;
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
 
-    #status {
-      text-align: center;
-      color: #64748b;
-      margin: 12px 0;
-      font-size: 14px;
-    }
+.avatar{
+  width:50px;
+  height:50px;
+  border-radius:50%;
+  background:#128c7e;
+  color:white;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden;
+  font-size:20px;
+}
 
-    #users {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
+.avatar img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
 
-    .user-card {
-      background: white;
-      border-radius: 15px;
-      padding: 13px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      box-shadow: 0 2px 8px rgba(0,0,0,.06);
-    }
+.info{
+  flex:1;
+}
 
-    .avatar {
-      width: 54px;
-      height: 54px;
-      min-width: 54px;
-      border-radius: 50%;
-      background: #128c7e;
-      color: white;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-      font-size: 24px;
-    }
+.name{
+  font-weight:bold;
+}
 
-    .avatar img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
+.country{
+  color:#777;
+  font-size:13px;
+  margin-top:3px;
+}
 
-    .info {
-      flex: 1;
-      min-width: 0;
-    }
+.chat{
+  background:#128c7e;
+  color:white;
+  border:0;
+  border-radius:8px;
+  padding:9px 12px;
+}
 
-    .username {
-      font-size: 17px;
-      font-weight: bold;
-      color: #111827;
-    }
-
-    .country {
-      color: #64748b;
-      font-size: 13px;
-      margin-top: 3px;
-    }
-
-    .status {
-      font-size: 13px;
-      margin-top: 4px;
-    }
-
-    .online {
-      color: #16a34a;
-    }
-
-    .offline {
-      color: #94a3b8;
-    }
-
-    .chat-btn {
-      border: 0;
-      background: #25d366;
-      color: white;
-      font-weight: bold;
-      padding: 10px 14px;
-      border-radius: 9px;
-      cursor: pointer;
-    }
-
-    .empty {
-      background: white;
-      border-radius: 15px;
-      padding: 30px;
-      text-align: center;
-      color: #64748b;
-    }
-  </style>
+.empty{
+  text-align:center;
+  padding:30px;
+  color:#777;
+}
+</style>
 </head>
 
 <body>
 
 <header>
-  <div class="header-inner">
-    <div class="logo">💬 SomChat</div>
 
-    <button id="logout">
-      Logout
-    </button>
-  </div>
+<h1>💬 SomChat</h1>
+
+<button
+class="logout"
+id="logout">
+Logout
+</button>
+
 </header>
 
-<main>
+<div class="search">
 
-  <input
-    id="search"
-    type="search"
-    placeholder="🔎 Search username..."
-    autocomplete="off"
-  >
+<input
+id="search"
+placeholder="🔎 Search username..."
+>
 
-  <div id="status">
-    Loading users...
-  </div>
+</div>
 
-  <div id="users"></div>
+<div id="users">
 
-</main>
+<div class="empty">
+Loading users...
+</div>
+
+</div>
 
 <script>
 
-// ========================================
-// SUPABASE CONNECTION
-// ========================================
+let currentUser=null;
+let allUsers=[];
 
-const SUPABASE_URL =
-  "https://praguwyyshmhmmowofqv.supabase.co";
-
-const SUPABASE_ANON_KEY =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InByYWd1d3l5c2htaG1tb3dvZnF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY1NzA3NjYsImV4cCI6MjEwMjE0Njc2Nn0.oJjsk_93uBMLeT-8ydDeecJBpcKI4IwTZaVmDU0t-fk";
-
-const supabaseClient =
-  window.supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_ANON_KEY
-  );
-
-
-// ========================================
-// VARIABLES
-// ========================================
-
-let currentUser = null;
-let allUsers = [];
-
-
-// ========================================
-// CHECK LOGIN
-// ========================================
-
-async function start() {
+async function start(){
 
   const {
     data,
     error
-  } = await supabaseClient.auth.getUser();
+  } =
+  await supabaseClient.auth
+  .getUser();
 
-  if (error || !data.user) {
+  if(error || !data.user){
 
-    window.location.href =
-      "login.html";
+    location.href="login.html";
 
     return;
   }
 
-  currentUser = data.user;
-
-  await setOnline();
+  currentUser=data.user;
 
   await loadUsers();
 
-  startRealtime();
-
 }
 
-
-// ========================================
-// SET ONLINE
-// ========================================
-
-async function setOnline() {
-
-  const { error } =
-    await supabaseClient
-      .from("profiles")
-      .update({
-        online: true,
-        last_seen: new Date().toISOString()
-      })
-      .eq("id", currentUser.id);
-
-  if (error) {
-    console.log(error);
-  }
-}
-
-
-// ========================================
-// LOAD USERS
-// ========================================
-
-async function loadUsers() {
+async function loadUsers(){
 
   const {
     data,
     error
-  } = await supabaseClient
-    .from("profiles")
-    .select(`
-      id,
-      username,
-      country,
-      bio,
-      avatar_url,
-      online,
-      last_seen
-    `)
-    .neq("id", currentUser.id)
-    .order("username", {
-      ascending: true
-    });
+  } =
+  await supabaseClient
+  .from("profiles")
+  .select(
+    "id,username,country,avatar_url,online"
+  )
+  .neq("id",currentUser.id)
+  .order("username");
 
-
-  if (error) {
+  if(error){
 
     console.error(error);
 
-    document.getElementById("status")
-      .textContent =
-      "❌ " + error.message;
+    document.getElementById("users")
+    .innerHTML=
+    `<div class="empty">
+      ❌ ${error.message}
+    </div>`;
 
     return;
   }
 
+  allUsers=data || [];
 
-  allUsers = data || [];
-
-  displayUsers(allUsers);
+  renderUsers(allUsers);
 
 }
 
+function renderUsers(users){
 
-// ========================================
-// DISPLAY USERS
-// ========================================
-
-function displayUsers(users) {
-
-  const container =
+  const box=
     document.getElementById("users");
 
-  const status =
-    document.getElementById("status");
+  box.innerHTML="";
 
-  container.innerHTML = "";
+  if(!users.length){
 
-
-  status.textContent =
-    users.length +
-    (users.length === 1
-      ? " user"
-      : " users");
-
-
-  if (users.length === 0) {
-
-    container.innerHTML = `
-      <div class="empty">
-        👥 No users found
-      </div>
-    `;
+    box.innerHTML=
+    `<div class="empty">
+      No users found.
+    </div>`;
 
     return;
   }
 
+  users.forEach(user=>{
 
-  users.forEach(user => {
-
-    const card =
+    const div=
       document.createElement("div");
 
-    card.className =
-      "user-card";
+    div.className="user";
 
+    let avatar="👤";
 
-    // Avatar
-    const avatar =
-      document.createElement("div");
+    if(user.avatar_url){
 
-    avatar.className =
-      "avatar";
-
-
-    if (user.avatar_url) {
-
-      const img =
-        document.createElement("img");
-
-      img.src =
-        user.avatar_url;
-
-      img.alt =
-        user.username;
-
-      avatar.appendChild(img);
-
-    } else {
-
-      avatar.textContent =
-        "👤";
+      avatar=
+      `<img src="${user.avatar_url}">`;
 
     }
 
+    div.innerHTML=`
 
-    // Info
-    const info =
-      document.createElement("div");
+      <div class="avatar">
+        ${avatar}
+      </div>
 
-    info.className =
-      "info";
+      <div class="info">
 
+        <div class="name">
+          ${escapeHtml(user.username || "User")}
+        </div>
 
-    const username =
-      document.createElement("div");
+        <div class="country">
+          🌍 ${escapeHtml(user.country || "Unknown")}
+        </div>
 
-    username.className =
-      "username";
+      </div>
 
-    username.textContent =
-      user.username || "User";
+      <button
+        class="chat"
+        onclick="openChat('${user.id}')">
+        💬 Chat
+      </button>
 
+    `;
 
-    const country =
-      document.createElement("div");
-
-    country.className =
-      "country";
-
-    country.textContent =
-      user.country
-        ? "🌍 " + user.country
-        : "";
-
-
-    const online =
-      document.createElement("div");
-
-    online.className =
-      "status " +
-      (user.online
-        ? "online"
-        : "offline");
-
-    online.textContent =
-      user.online
-        ? "● Online"
-        : "● Offline";
-
-
-    info.appendChild(username);
-    info.appendChild(country);
-    info.appendChild(online);
-
-
-    // Chat
-    const button =
-      document.createElement("button");
-
-    button.className =
-      "chat-btn";
-
-    button.textContent =
-      "💬 Chat";
-
-
-    button.onclick = function() {
-
-      window.location.href =
-        "chat.html?user=" +
-        encodeURIComponent(user.id);
-
-    };
-
-
-    card.appendChild(avatar);
-    card.appendChild(info);
-    card.appendChild(button);
-
-    container.appendChild(card);
+    box.appendChild(div);
 
   });
 
 }
 
+function openChat(id){
 
-// ========================================
-// SEARCH
-// ========================================
-
-document
-  .getElementById("search")
-  .addEventListener(
-    "input",
-    function() {
-
-      const value =
-        this.value
-          .trim()
-          .toLowerCase();
-
-
-      if (!value) {
-
-        displayUsers(allUsers);
-
-        return;
-      }
-
-
-      const filtered =
-        allUsers.filter(user => {
-
-          const username =
-            (user.username || "")
-              .toLowerCase();
-
-          const country =
-            (user.country || "")
-              .toLowerCase();
-
-          return (
-            username.includes(value) ||
-            country.includes(value)
-          );
-
-        });
-
-
-      displayUsers(filtered);
-
-    }
-  );
-
-
-// ========================================
-// REALTIME
-// ========================================
-
-function startRealtime() {
-
-  supabaseClient
-    .channel("profiles-realtime")
-    .on(
-      "postgres_changes",
-      {
-        event: "*",
-        schema: "public",
-        table: "profiles"
-      },
-      function() {
-
-        loadUsers();
-
-      }
-    )
-    .subscribe();
+  location.href=
+    "chat.html?user="+
+    encodeURIComponent(id);
 
 }
 
+document
+.getElementById("search")
+.addEventListener(
+"input",
+function(){
 
-// ========================================
-// LOGOUT
-// ========================================
+  const q=
+    this.value
+    .trim()
+    .toLowerCase();
+
+  const filtered=
+    allUsers.filter(user=>
+      (user.username || "")
+      .toLowerCase()
+      .includes(q)
+    );
+
+  renderUsers(filtered);
+
+});
 
 document
-  .getElementById("logout")
-  .addEventListener(
-    "click",
-    async function() {
+.getElementById("logout")
+.addEventListener(
+"click",
+async function(){
 
-      if (currentUser) {
+  await supabaseClient.auth.signOut();
 
-        await supabaseClient
-          .from("profiles")
-          .update({
-            online: false,
-            last_seen: new Date().toISOString()
-          })
-          .eq("id", currentUser.id);
+  location.href="index.html";
 
-      }
+});
 
+function escapeHtml(text){
 
-      await supabaseClient.auth.signOut();
+  const div=
+    document.createElement("div");
 
-      window.location.href =
-        "login.html";
+  div.textContent=text;
 
-    }
-  );
+  return div.innerHTML;
 
-
-// ========================================
-// START APP
-// ========================================
+}
 
 start();
 
