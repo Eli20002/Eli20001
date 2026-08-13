@@ -1,223 +1,226 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
+
+<meta
+name="viewport"
+content="width=device-width,initial-scale=1.0">
+
 <title>SomChat Chat</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase.js"></script>
 
 <style>
 *{
-  box-sizing:border-box;
-  margin:0;
-  padding:0;
-  font-family:Arial,sans-serif;
+box-sizing:border-box;
+margin:0;
+padding:0;
+font-family:Arial,sans-serif;
 }
 
 body{
-  background:#e5ddd5;
-  height:100vh;
-  overflow:hidden;
+background:#e5ddd5;
+height:100vh;
+overflow:hidden;
 }
 
 header{
-  height:65px;
-  background:#075e54;
-  color:white;
-  display:flex;
-  align-items:center;
-  gap:12px;
-  padding:8px 12px;
+height:65px;
+background:#075e54;
+color:white;
+display:flex;
+align-items:center;
+gap:12px;
+padding:8px 12px;
 }
 
 .back{
-  background:none;
-  border:0;
-  color:white;
-  font-size:30px;
+background:none;
+border:0;
+color:white;
+font-size:30px;
 }
 
 .avatar{
-  width:45px;
-  height:45px;
-  border-radius:50%;
-  background:#128c7e;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  overflow:hidden;
+width:45px;
+height:45px;
+border-radius:50%;
+background:#128c7e;
+display:flex;
+align-items:center;
+justify-content:center;
+overflow:hidden;
 }
 
 .avatar img{
-  width:100%;
-  height:100%;
-  object-fit:cover;
+width:100%;
+height:100%;
+object-fit:cover;
 }
 
 .user-info{
-  flex:1;
+flex:1;
 }
 
 .username{
-  font-size:17px;
-  font-weight:bold;
+font-size:17px;
+font-weight:bold;
 }
 
 .status{
-  font-size:12px;
+font-size:12px;
 }
 
 #messages{
-  height:calc(100vh - 125px);
-  overflow-y:auto;
-  padding:15px;
-  display:flex;
-  flex-direction:column;
-  gap:7px;
+height:calc(100vh - 125px);
+overflow-y:auto;
+padding:15px;
+display:flex;
+flex-direction:column;
+gap:7px;
 }
 
 .message{
-  max-width:78%;
-  padding:9px 12px;
-  border-radius:10px;
-  word-break:break-word;
+max-width:78%;
+padding:9px 12px;
+border-radius:10px;
+word-break:break-word;
 }
 
 .mine{
-  align-self:flex-end;
-  background:#dcf8c6;
+align-self:flex-end;
+background:#dcf8c6;
 }
 
 .theirs{
-  align-self:flex-start;
-  background:white;
+align-self:flex-start;
+background:white;
 }
 
 .time{
-  font-size:10px;
-  color:#777;
-  text-align:right;
-  margin-top:4px;
+font-size:10px;
+color:#777;
+text-align:right;
+margin-top:4px;
 }
 
 .empty{
-  margin:auto;
-  background:white;
-  padding:15px;
-  border-radius:10px;
-  color:#777;
+margin:auto;
+background:white;
+padding:15px;
+border-radius:10px;
+color:#777;
 }
 
 .input-area{
-  height:60px;
-  background:#f0f2f5;
-  display:flex;
-  gap:8px;
-  padding:8px;
+height:60px;
+background:#f0f2f5;
+display:flex;
+gap:8px;
+padding:8px;
 }
 
 #messageInput{
-  flex:1;
-  border:0;
-  outline:0;
-  border-radius:22px;
-  padding:12px 16px;
-  font-size:16px;
+flex:1;
+border:0;
+outline:0;
+border-radius:22px;
+padding:12px 16px;
+font-size:16px;
 }
 
 #sendButton{
-  width:44px;
-  height:44px;
-  border:0;
-  border-radius:50%;
-  background:#128c7e;
-  color:white;
-  font-size:20px;
+width:44px;
+height:44px;
+border:0;
+border-radius:50%;
+background:#128c7e;
+color:white;
+font-size:20px;
 }
 
 @media(max-width:500px){
-  .message{
-    max-width:85%;
-  }
+
+.message{
+max-width:85%;
+}
+
 }
 </style>
+
 </head>
 
 <body>
 
 <header>
 
-<button class="back" onclick="history.back()">‹</button>
+<button
+class="back"
+onclick="history.back()">
+‹
+</button>
 
-<div id="avatar" class="avatar">👤</div>
+<div id="avatar" class="avatar">
+👤
+</div>
 
 <div class="user-info">
-  <div id="username" class="username">Loading...</div>
-  <div id="status" class="status">...</div>
+
+<div
+id="username"
+class="username">
+Loading...
+</div>
+
+<div
+id="status"
+class="status">
+...
+</div>
+
 </div>
 
 </header>
 
 <div id="messages">
-  <div class="empty">Loading messages...</div>
+
+<div class="empty">
+Loading messages...
+</div>
+
 </div>
 
 <div class="input-area">
 
 <input
-  id="messageInput"
-  type="text"
-  placeholder="Write a message..."
-  autocomplete="off"
+id="messageInput"
+type="text"
+placeholder="Write a message..."
+autocomplete="off"
 >
 
-<button id="sendButton">➤</button>
+<button id="sendButton">
+➤
+</button>
 
 </div>
 
 <script>
 
-// ===============================
-// SUPABASE
-// ===============================
+let currentUser=null;
+let receiverId=null;
 
-const SUPABASE_URL =
-"https://praguwyyshmhmmowofqv.supabase.co";
-
-const SUPABASE_ANON_KEY =
-"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzIiwicmVmIjoicHJhZ3V3eXlzaG1obW1vd29mcXZxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY1NzA3NjYsImV4cCI6MjEwMjE0Njc2Nn0.oJjsk_93uBMLeT-8ydDeecJBpcKI4IwTZaVmDU0t-fk";
-
-const supabaseClient =
-window.supabase.createClient(
-  SUPABASE_URL,
-  SUPABASE_ANON_KEY
-);
-
-
-// ===============================
-// VARIABLES
-// ===============================
-
-let currentUser = null;
-
-let receiverId = null;
-
-
-// Get ?user=ID
-
-const params =
+const params=
 new URLSearchParams(
-  window.location.search
+window.location.search
 );
 
-receiverId =
+receiverId=
 params.get("user");
 
-
-// ===============================
-// START
-// ===============================
 
 async function start(){
 
@@ -234,7 +237,8 @@ async function start(){
     data,
     error
   } =
-  await supabaseClient.auth.getUser();
+  await supabaseClient.auth
+  .getUser();
 
   if(error || !data.user){
 
@@ -243,20 +247,16 @@ async function start(){
     return;
   }
 
-  currentUser =
-  data.user;
+  currentUser=data.user;
 
   await loadReceiver();
 
   await loadMessages();
 
   startRealtime();
+
 }
 
-
-// ===============================
-// RECEIVER
-// ===============================
 
 async function loadReceiver(){
 
@@ -283,32 +283,27 @@ async function loadReceiver(){
 
   document
   .getElementById("username")
-  .textContent =
-  data.username || "User";
+  .textContent=
+    data.username || "User";
 
   document
   .getElementById("status")
-  .textContent =
-  data.online
-  ? "● Online"
-  : "Offline";
-
-  const avatar =
-  document.getElementById("avatar");
+  .textContent=
+    data.online
+    ? "● Online"
+    : "Offline";
 
   if(data.avatar_url){
 
-    avatar.innerHTML =
-    `<img src="${data.avatar_url}">`;
+    document
+    .getElementById("avatar")
+    .innerHTML=
+      `<img src="${data.avatar_url}">`;
 
   }
 
 }
 
-
-// ===============================
-// LOAD MESSAGES
-// ===============================
 
 async function loadMessages(){
 
@@ -331,39 +326,34 @@ async function loadMessages(){
 
   if(error){
 
-    console.error(error);
-
     document
     .getElementById("messages")
-    .innerHTML =
-    `<div class="empty">
-      ❌ ${error.message}
-    </div>`;
+    .innerHTML=
+      `<div class="empty">
+        ❌ ${error.message}
+      </div>`;
 
     return;
   }
 
   renderMessages(data || []);
+
 }
 
 
-// ===============================
-// DISPLAY
-// ===============================
-
 function renderMessages(list){
 
-  const box =
-  document.getElementById("messages");
+  const box=
+    document.getElementById("messages");
 
   box.innerHTML="";
 
-  if(list.length===0){
+  if(!list.length){
 
-    box.innerHTML =
-    `<div class="empty">
-      👋 Start your conversation
-    </div>`;
+    box.innerHTML=
+      `<div class="empty">
+        👋 Start your conversation
+      </div>`;
 
     return;
   }
@@ -371,55 +361,53 @@ function renderMessages(list){
   list.forEach(addMessage);
 
   scrollBottom();
+
 }
 
 
-// ===============================
-// ADD MESSAGE
-// ===============================
-
 function addMessage(row){
 
-  const box =
-  document.getElementById("messages");
+  const box=
+    document.getElementById("messages");
 
-  const empty =
-  box.querySelector(".empty");
+  const empty=
+    box.querySelector(".empty");
 
-  if(empty) empty.remove();
+  if(empty)
+    empty.remove();
 
-  const div =
-  document.createElement("div");
+  const div=
+    document.createElement("div");
 
-  const mine =
-  row.sender_id === currentUser.id;
+  const mine=
+    row.sender_id === currentUser.id;
 
-  div.className =
-  mine
-  ? "message mine"
-  : "message theirs";
+  div.className=
+    mine
+    ? "message mine"
+    : "message theirs";
 
-  const text =
-  document.createElement("div");
+  const text=
+    document.createElement("div");
 
-  text.textContent =
-  row.message;
+  text.textContent=
+    row.message;
 
-  const time =
-  document.createElement("div");
+  const time=
+    document.createElement("div");
 
   time.className="time";
 
-  time.textContent =
-  new Date(
-    row.created_at
-  ).toLocaleTimeString(
-    [],
-    {
-      hour:"2-digit",
-      minute:"2-digit"
-    }
-  );
+  time.textContent=
+    new Date(
+      row.created_at
+    ).toLocaleTimeString(
+      [],
+      {
+        hour:"2-digit",
+        minute:"2-digit"
+      }
+    );
 
   div.appendChild(text);
 
@@ -428,24 +416,22 @@ function addMessage(row){
   box.appendChild(div);
 
   scrollBottom();
+
 }
 
 
-// ===============================
-// SEND
-// ===============================
-
 async function sendMessage(){
 
-  const input =
-  document.getElementById(
-    "messageInput"
-  );
+  const input=
+    document.getElementById(
+      "messageInput"
+    );
 
-  const message =
-  input.value.trim();
+  const message=
+    input.value.trim();
 
-  if(!message) return;
+  if(!message)
+    return;
 
   const {
     data,
@@ -454,14 +440,16 @@ async function sendMessage(){
   await supabaseClient
   .from("messages")
   .insert({
+
     sender_id:
-    currentUser.id,
+      currentUser.id,
 
     receiver_id:
-    receiverId,
+      receiverId,
 
     message:
-    message
+      message
+
   })
   .select()
   .single();
@@ -473,27 +461,21 @@ async function sendMessage(){
       error.message
     );
 
-    console.error(error);
-
     return;
   }
 
   input.value="";
 
-  // Show immediately
   addMessage(data);
+
 }
 
-
-// ===============================
-// REALTIME
-// ===============================
 
 function startRealtime(){
 
   supabaseClient
   .channel(
-    "messages-room"
+    "somchat-messages"
   )
   .on(
     "postgres_changes",
@@ -502,94 +484,83 @@ function startRealtime(){
       schema:"public",
       table:"messages"
     },
-    payload => {
+    payload=>{
 
-      const row =
-      payload.new;
+      const row=
+        payload.new;
 
-      const belongs =
-      (
-        row.sender_id === currentUser.id &&
-        row.receiver_id === receiverId
-      )
-      ||
-      (
-        row.sender_id === receiverId &&
-        row.receiver_id === currentUser.id
-      );
+      const belongs=
 
-      if(!belongs) return;
+        (
+          row.sender_id === currentUser.id &&
+          row.receiver_id === receiverId
+        )
 
-      // Own messages already displayed
+        ||
+
+        (
+          row.sender_id === receiverId &&
+          row.receiver_id === currentUser.id
+        );
+
+      if(!belongs)
+        return;
+
       if(
         row.sender_id === currentUser.id
-      ){
+      )
         return;
-      }
 
       addMessage(row);
 
     }
   )
   .subscribe();
+
 }
 
-
-// ===============================
-// SCROLL
-// ===============================
 
 function scrollBottom(){
 
-  const box =
-  document.getElementById(
-    "messages"
-  );
+  const box=
+    document.getElementById(
+      "messages"
+    );
 
   setTimeout(()=>{
-    box.scrollTop =
-    box.scrollHeight;
+
+    box.scrollTop=
+      box.scrollHeight;
+
   },50);
+
 }
 
-
-// ===============================
-// BUTTON
-// ===============================
 
 document
 .getElementById("sendButton")
 .addEventListener(
-  "click",
-  sendMessage
+"click",
+sendMessage
 );
 
-
-// ===============================
-// ENTER
-// ===============================
 
 document
 .getElementById("messageInput")
 .addEventListener(
-  "keydown",
-  e => {
+"keydown",
+e=>{
 
-    if(e.key==="Enter"){
+  if(e.key==="Enter"){
 
-      e.preventDefault();
+    e.preventDefault();
 
-      sendMessage();
-
-    }
+    sendMessage();
 
   }
-);
 
+});
 
-// ===============================
-// START
-// ===============================
 
 start();
 
