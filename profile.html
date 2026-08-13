@@ -1,368 +1,308 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>Profile | SomChat</title>
+<meta charset="UTF-8">
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<meta
+name="viewport"
+content="width=device-width,initial-scale=1.0">
 
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: Arial, sans-serif;
-    }
+<title>SomChat - Profile</title>
 
-    body {
-      background: #f2f5f8;
-      min-height: 100vh;
-    }
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase.js"></script>
 
-    header {
-      height: 65px;
-      background: #087f5b;
-      color: white;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 20px;
-    }
+<style>
 
-    .logo {
-      font-size: 23px;
-      font-weight: bold;
-    }
+*{
+box-sizing:border-box;
+margin:0;
+padding:0;
+font-family:Arial,sans-serif;
+}
 
-    header a {
-      color: white;
-      text-decoration: none;
-      font-weight: bold;
-    }
+body{
+min-height:100vh;
+background:#f5f7f9;
+padding:20px;
+}
 
-    .container {
-      width: 100%;
-      max-width: 500px;
-      margin: 30px auto;
-      padding: 20px;
-    }
+.box{
+max-width:450px;
+margin:auto;
+background:white;
+padding:25px;
+border-radius:18px;
+box-shadow:0 5px 20px rgba(0,0,0,.1);
+}
 
-    .card {
-      background: white;
-      border-radius: 18px;
-      padding: 30px 25px;
-      box-shadow: 0 8px 30px rgba(0,0,0,.08);
-      text-align: center;
-    }
+h1{
+text-align:center;
+color:#075e54;
+margin-bottom:20px;
+}
 
-    .avatar {
-      width: 100px;
-      height: 100px;
-      border-radius: 50%;
-      background: #087f5b;
-      color: white;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 0 auto 18px;
-      font-size: 40px;
-      font-weight: bold;
-    }
+.avatar{
+width:100px;
+height:100px;
+border-radius:50%;
+background:#128c7e;
+color:white;
+display:flex;
+align-items:center;
+justify-content:center;
+margin:0 auto 20px;
+font-size:40px;
+overflow:hidden;
+}
 
-    h1 {
-      font-size: 27px;
-      margin-bottom: 7px;
-    }
+.avatar img{
+width:100%;
+height:100%;
+object-fit:cover;
+}
 
-    .status {
-      color: #087f5b;
-      margin-bottom: 25px;
-    }
+label{
+display:block;
+font-weight:bold;
+margin:14px 0 6px;
+}
 
-    .info {
-      text-align: left;
-      border-top: 1px solid #eee;
-      padding-top: 20px;
-    }
+input,
+textarea{
+width:100%;
+padding:13px;
+border:1px solid #ddd;
+border-radius:10px;
+font-size:16px;
+outline:none;
+}
 
-    .row {
-      margin-bottom: 18px;
-    }
+textarea{
+min-height:100px;
+resize:vertical;
+}
 
-    .label {
-      color: #777;
-      font-size: 14px;
-      margin-bottom: 5px;
-    }
+button{
+width:100%;
+padding:14px;
+margin-top:18px;
+border:0;
+border-radius:10px;
+background:#075e54;
+color:white;
+font-weight:bold;
+font-size:16px;
+}
 
-    .value {
-      font-size: 17px;
-      font-weight: bold;
-      word-break: break-word;
-    }
+#result{
+text-align:center;
+margin-top:15px;
+}
 
-    .buttons {
-      margin-top: 25px;
-      display: flex;
-      gap: 10px;
-    }
+.back{
+background:#eee;
+color:#333;
+}
 
-    .btn {
-      flex: 1;
-      padding: 13px;
-      border-radius: 10px;
-      font-size: 15px;
-      font-weight: bold;
-      cursor: pointer;
-      text-decoration: none;
-      border: none;
-      text-align: center;
-    }
+</style>
 
-    .chat-btn {
-      background: #087f5b;
-      color: white;
-    }
-
-    .logout-btn {
-      background: #eee;
-      color: #333;
-    }
-
-    #message {
-      margin-top: 15px;
-      text-align: center;
-      color: #d9534f;
-    }
-  </style>
 </head>
 
 <body>
 
-<header>
+<div class="box">
 
-  <div class="logo">
-    💬 SomChat
-  </div>
+<h1>👤 My Profile</h1>
 
-  <a href="chat.html">
-    Chat
-  </a>
+<div
+id="avatar"
+class="avatar">
+👤
+</div>
 
-</header>
+<label>Username</label>
 
-<div class="container">
+<input
+id="username"
+type="text"
+maxlength="30"
+>
 
-  <div class="card">
+<label>Country</label>
 
-    <div class="avatar" id="avatar">
-      U
-    </div>
+<input
+id="country"
+type="text"
+>
 
-    <h1 id="username">
-      Loading...
-    </h1>
+<label>About</label>
 
-    <div class="status">
-      ● Online
-    </div>
+<textarea
+id="bio"
+placeholder="Tell people about yourself..."
+></textarea>
 
-    <div class="info">
+<button id="save">
+💾 Save Profile
+</button>
 
-      <div class="row">
-        <div class="label">Username</div>
+<button
+class="back"
+onclick="location.href='users.html'">
+← Back
+</button>
 
-        <div class="value" id="usernameInfo">
-          Loading...
-        </div>
-      </div>
-
-      <div class="row">
-        <div class="label">Email</div>
-
-        <div class="value" id="emailInfo">
-          Loading...
-        </div>
-      </div>
-
-      <div class="row">
-        <div class="label">Country</div>
-
-        <div class="value" id="countryInfo">
-          Somalia 🇸🇴
-        </div>
-      </div>
-
-    </div>
-
-    <div class="buttons">
-
-      <a
-        href="chat.html"
-        class="btn chat-btn"
-      >
-        💬 Open Chat
-      </a>
-
-      <button
-        id="logout"
-        class="btn logout-btn"
-      >
-        Logout
-      </button>
-
-    </div>
-
-    <div id="message"></div>
-
-  </div>
+<div id="result"></div>
 
 </div>
 
 <script>
 
-const SUPABASE_URL =
-  "https://praguwyyshmhmmowofqv.supabase.co";
+let currentUser=null;
 
-const SUPABASE_KEY =
-  "sb_publishable_JPzVvllEgAUcBD_ahGZR6g_Z2rrzRDW";
-
-const supabaseClient =
-  window.supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_KEY
-  );
-
-
-// =====================================
-// LOAD USER
-// =====================================
-
-async function loadProfile() {
+async function start(){
 
   const {
     data,
     error
-  } = await supabaseClient.auth.getUser();
+  } =
+  await supabaseClient.auth
+  .getUser();
 
-  if (error || !data.user) {
+  if(error || !data.user){
 
-    window.location.href =
-      "login.html";
+    location.href="login.html";
 
     return;
   }
 
-  const user = data.user;
+  currentUser=data.user;
 
-  let username =
-    user.user_metadata?.username ||
-    "SomChat User";
-
-  let email =
-    user.email || "";
-
-  let country =
-    "Somalia";
-
-
-  // =====================================
-  // TRY PROFILES TABLE
-  // =====================================
-
-  const result =
-    await supabaseClient
-      .from("profiles")
-      .select("username,email,country")
-      .eq("id", user.id)
-      .maybeSingle();
-
-
-  if (result.data) {
-
-    username =
-      result.data.username ||
-      username;
-
-    email =
-      result.data.email ||
-      email;
-
-    country =
-      result.data.country ||
-      country;
-  }
-
-
-  // =====================================
-  // SHOW PROFILE
-  // =====================================
-
-  document.getElementById(
-    "username"
-  ).textContent = username;
-
-  document.getElementById(
-    "usernameInfo"
-  ).textContent = username;
-
-  document.getElementById(
-    "emailInfo"
-  ).textContent = email;
-
-  document.getElementById(
-    "countryInfo"
-  ).textContent =
-    country + " 🇸🇴";
-
-  document.getElementById(
-    "avatar"
-  ).textContent =
-    username
-      .charAt(0)
-      .toUpperCase();
+  await loadProfile();
 
 }
 
 
-// =====================================
-// LOGOUT
-// =====================================
+async function loadProfile(){
+
+  const {
+    data,
+    error
+  } =
+  await supabaseClient
+  .from("profiles")
+  .select(
+    "username,country,bio,avatar_url"
+  )
+  .eq("id",currentUser.id)
+  .single();
+
+  if(error){
+
+    show(error.message);
+
+    return;
+  }
+
+  document
+  .getElementById("username")
+  .value=
+    data.username || "";
+
+  document
+  .getElementById("country")
+  .value=
+    data.country || "";
+
+  document
+  .getElementById("bio")
+  .value=
+    data.bio || "";
+
+  if(data.avatar_url){
+
+    document
+    .getElementById("avatar")
+    .innerHTML=
+      `<img src="${data.avatar_url}">`;
+
+  }
+
+}
+
 
 document
-  .getElementById("logout")
-  .addEventListener(
-    "click",
-    async function() {
+.getElementById("save")
+.addEventListener(
+"click",
+async function(){
 
-      const {
-        error
-      } = await supabaseClient
-        .auth
-        .signOut();
+  const username=
+    document
+    .getElementById("username")
+    .value.trim();
 
-      if (error) {
+  const country=
+    document
+    .getElementById("country")
+    .value.trim();
 
-        document.getElementById(
-          "message"
-        ).textContent =
-          error.message;
+  const bio=
+    document
+    .getElementById("bio")
+    .value.trim();
 
-        return;
-      }
+  if(username.length<3){
 
-      window.location.href =
-        "login.html";
+    show(
+      "❌ Username waa gaaban yahay."
+    );
 
-    }
+    return;
+  }
+
+  const {
+    error
+  } =
+  await supabaseClient
+  .from("profiles")
+  .update({
+
+    username:username,
+    country:country,
+    bio:bio
+
+  })
+  .eq("id",currentUser.id);
+
+  if(error){
+
+    show(
+      "❌ "+error.message
+    );
+
+    return;
+  }
+
+  show(
+    "✅ Profile waa la kaydiyay."
   );
 
+});
 
-// START
 
-loadProfile();
+function show(text){
+
+  document
+  .getElementById("result")
+  .textContent=text;
+
+}
+
+
+start();
 
 </script>
 
