@@ -4,7 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>SomChat</title>
+  <title>SomChat | Somali Community</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
     * {
@@ -17,12 +19,13 @@
     body {
       background: #f2f5f8;
       color: #17202a;
+      min-height: 100vh;
     }
 
     header {
       background: #087f5b;
       color: white;
-      padding: 18px 25px;
+      padding: 18px 22px;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -33,14 +36,25 @@
       font-weight: bold;
     }
 
-    .login {
+    .nav {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .nav a,
+    #logout {
       color: white;
       text-decoration: none;
       font-weight: bold;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      font-size: 15px;
     }
 
     main {
-      min-height: calc(100vh - 70px);
+      min-height: calc(100vh - 120px);
       display: flex;
       justify-content: center;
       align-items: center;
@@ -49,28 +63,28 @@
 
     .box {
       width: 100%;
-      max-width: 500px;
+      max-width: 550px;
       background: white;
-      padding: 35px 25px;
-      border-radius: 18px;
+      padding: 40px 25px;
+      border-radius: 20px;
       text-align: center;
-      box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+      box-shadow: 0 8px 30px rgba(0,0,0,.08);
     }
 
     .icon {
-      font-size: 60px;
+      font-size: 65px;
       margin-bottom: 15px;
     }
 
     h1 {
       font-size: 34px;
-      margin-bottom: 10px;
+      margin-bottom: 12px;
     }
 
     p {
       color: #667085;
       line-height: 1.6;
-      margin-bottom: 25px;
+      margin-bottom: 28px;
     }
 
     .buttons {
@@ -82,10 +96,11 @@
 
     .btn {
       display: inline-block;
-      padding: 13px 25px;
+      padding: 14px 25px;
       border-radius: 10px;
       text-decoration: none;
       font-weight: bold;
+      cursor: pointer;
     }
 
     .register {
@@ -99,50 +114,201 @@
       background: white;
     }
 
+    .chat-btn {
+      background: #087f5b;
+      color: white;
+    }
+
     footer {
       text-align: center;
       padding: 15px;
       color: #777;
       font-size: 14px;
     }
+
+    #loggedIn {
+      display: none;
+    }
+
+    #loggedOut {
+      display: block;
+    }
+
+    @media (max-width: 500px) {
+      h1 {
+        font-size: 28px;
+      }
+
+      .logo {
+        font-size: 21px;
+      }
+    }
   </style>
 </head>
 
 <body>
 
-  <header>
-    <div class="logo">💬 SomChat</div>
-    <a class="login" href="login.html">Login</a>
-  </header>
+<header>
 
-  <main>
-    <div class="box">
+  <div class="logo">
+    💬 SomChat
+  </div>
 
-      <div class="icon">💬</div>
+  <div class="nav">
 
-      <h1>Welcome to SomChat</h1>
+    <div id="loggedOut">
+      <a href="login.html">Login</a>
+    </div>
 
-      <p>
-        Connect with friends, meet new people,
-        and chat with the Somali community.
-      </p>
+    <div id="loggedIn">
+      <a href="chat.html">Chat</a>
+    </div>
 
-      <div class="buttons">
-        <a class="btn register" href="register.html">
-          Create Account
-        </a>
+  </div>
 
-        <a class="btn login-btn" href="login.html">
-          Login
-        </a>
-      </div>
+</header>
+
+
+<main>
+
+  <div class="box">
+
+    <div class="icon">
+      💬
+    </div>
+
+    <h1>
+      Welcome to SomChat
+    </h1>
+
+    <p>
+      Connect with friends, meet new people,
+      and chat with the Somali community.
+    </p>
+
+
+    <!-- LOGGED OUT -->
+
+    <div
+      id="loggedOutButtons"
+      class="buttons"
+    >
+
+      <a
+        class="btn register"
+        href="register.html"
+      >
+        Create Account
+      </a>
+
+      <a
+        class="btn login-btn"
+        href="login.html"
+      >
+        Login
+      </a>
 
     </div>
-  </main>
 
-  <footer>
-    © 2026 SomChat. All rights reserved.
-  </footer>
+
+    <!-- LOGGED IN -->
+
+    <div
+      id="loggedInButtons"
+      class="buttons"
+      style="display:none;"
+    >
+
+      <a
+        class="btn chat-btn"
+        href="chat.html"
+      >
+        💬 Open SomChat
+      </a>
+
+      <a
+        class="btn login-btn"
+        href="profile.html"
+      >
+        👤 My Profile
+      </a>
+
+    </div>
+
+  </div>
+
+</main>
+
+
+<footer>
+  © 2026 SomChat. All rights reserved.
+</footer>
+
+
+<script>
+
+const SUPABASE_URL =
+  "https://praguwyyshmhmmowofqv.supabase.co";
+
+const SUPABASE_KEY =
+  "sb_publishable_JPzVvllEgAUcBD_ahGZR6g_Z2rrzRDW";
+
+const supabaseClient =
+  window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+  );
+
+
+// ==================================
+// CHECK LOGIN
+// ==================================
+
+async function checkLogin() {
+
+  const {
+    data
+  } = await supabaseClient.auth.getUser();
+
+  const loggedIn =
+    !!data.user;
+
+
+  if (loggedIn) {
+
+    document.getElementById(
+      "loggedOut"
+    ).style.display = "none";
+
+    document.getElementById(
+      "loggedIn"
+    ).style.display = "block";
+
+    document.getElementById(
+      "loggedOutButtons"
+    ).style.display = "none";
+
+    document.getElementById(
+      "loggedInButtons"
+    ).style.display = "flex";
+
+  } else {
+
+    document.getElementById(
+      "loggedOut"
+    ).style.display = "block";
+
+    document.getElementById(
+      "loggedIn"
+    ).style.display = "none";
+
+  }
+
+}
+
+checkLogin();
+
+</script>
 
 </body>
 </html>
