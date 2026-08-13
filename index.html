@@ -1,208 +1,140 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>SomChat</title>
 
-  <title>SomChat</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase.js"></script>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+  font-family:Arial,sans-serif;
+}
 
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: Arial, sans-serif;
-    }
+body{
+  min-height:100vh;
+  background:linear-gradient(135deg,#075e54,#128c7e);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  padding:20px;
+}
 
-    body {
-      min-height: 100vh;
-      background: linear-gradient(135deg, #075e54, #128c7e);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-    }
+.box{
+  width:100%;
+  max-width:420px;
+  background:white;
+  padding:35px 25px;
+  border-radius:22px;
+  text-align:center;
+  box-shadow:0 10px 35px rgba(0,0,0,.2);
+}
 
-    .card {
-      width: 100%;
-      max-width: 420px;
-      background: white;
-      border-radius: 22px;
-      padding: 35px 25px;
-      text-align: center;
-      box-shadow: 0 10px 35px rgba(0,0,0,.2);
-    }
+.logo{
+  font-size:55px;
+}
 
-    .logo {
-      font-size: 45px;
-      margin-bottom: 10px;
-    }
+h1{
+  color:#075e54;
+  margin:10px 0;
+}
 
-    h1 {
-      color: #075e54;
-      margin-bottom: 8px;
-    }
+p{
+  color:#777;
+  margin-bottom:25px;
+}
 
-    .description {
-      color: #64748b;
-      margin-bottom: 25px;
-    }
+.btn{
+  display:block;
+  width:100%;
+  padding:14px;
+  margin-top:12px;
+  border-radius:12px;
+  text-decoration:none;
+  font-weight:bold;
+  font-size:16px;
+}
 
-    .btn {
-      display: block;
-      width: 100%;
-      padding: 14px;
-      margin-top: 12px;
-      border-radius: 12px;
-      text-decoration: none;
-      font-size: 16px;
-      font-weight: bold;
-      cursor: pointer;
-      border: none;
-    }
+.register{
+  background:#25d366;
+  color:white;
+}
 
-    .register {
-      background: #25d366;
-      color: white;
-    }
+.login{
+  background:#075e54;
+  color:white;
+}
 
-    .login {
-      background: #075e54;
-      color: white;
-    }
-
-    .status {
-      margin-top: 22px;
-      padding: 12px;
-      border-radius: 10px;
-      background: #f1f5f9;
-      color: #475569;
-      font-size: 14px;
-    }
-
-    .success {
-      color: #15803d;
-      background: #dcfce7;
-    }
-
-    .error {
-      color: #b91c1c;
-      background: #fee2e2;
-    }
-  </style>
+.status{
+  margin-top:20px;
+  padding:12px;
+  border-radius:10px;
+  background:#f1f5f9;
+  color:#475569;
+}
+</style>
 </head>
 
 <body>
 
-  <div class="card">
+<div class="box">
 
-    <div class="logo">💬</div>
+<div class="logo">💬</div>
 
-    <h1>SomChat</h1>
+<h1>SomChat</h1>
 
-    <p class="description">
-      Chat with your friends and connect with people.
-    </p>
+<p>
+Chat with friends and connect with people.
+</p>
 
-    <a
-      href="register.html"
-      class="btn register">
-      📝 Create Account
-    </a>
+<a class="btn register" href="register.html">
+📝 Create Account
+</a>
 
-    <a
-      href="login.html"
-      class="btn login">
-      🔐 Login
-    </a>
+<a class="btn login" href="login.html">
+🔐 Login
+</a>
 
-    <div
-      id="connection"
-      class="status">
-      Checking Supabase...
-    </div>
+<div id="status" class="status">
+Checking connection...
+</div>
 
-  </div>
-
+</div>
 
 <script>
 
-// ======================================
-// SUPABASE CONNECTION
-// ======================================
+async function test(){
 
-const SUPABASE_URL =
-"https://praguwyyshmhmmowofqv.supabase.co";
+  const status =
+    document.getElementById("status");
 
-const SUPABASE_ANON_KEY =
-"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzIiwicmVmIjoicHJhZ3V3eXlzaG1obW1vd29mcXZxIiwicm9sIjoiYW5vbiIsImlhdCI6MTc4NjU3MDc2NiwiZXhwIjoyMTAyMTQ2NzY2fQ.oJjsk_93uBMLeT-8ydDeecJBpcKI4IwTZaVmDU0t-fk";
-
-const supabaseClient =
-window.supabase.createClient(
-  SUPABASE_URL,
-  SUPABASE_ANON_KEY
-);
-
-
-// ======================================
-// TEST CONNECTION
-// ======================================
-
-async function testConnection() {
-
-  const box =
-  document.getElementById(
-    "connection"
-  );
-
-  try {
-
-    const {
-      error
-    } =
+  const { error } =
     await supabaseClient
-    .from("profiles")
-    .select("id")
-    .limit(1);
+      .from("profiles")
+      .select("id")
+      .limit(1);
 
+  if(error){
 
-    if (error) {
-
-      box.className =
-      "status error";
-
-      box.textContent =
+    status.textContent =
       "❌ Supabase Error";
-
-      console.error(error);
-
-      return;
-    }
-
-
-    box.className =
-    "status success";
-
-    box.textContent =
-    "✅ Supabase Connected!";
-
-  } catch(error) {
-
-    box.className =
-    "status error";
-
-    box.textContent =
-    "❌ Connection failed";
 
     console.error(error);
 
+    return;
   }
+
+  status.textContent =
+    "✅ Supabase Connected!";
 
 }
 
-testConnection();
+test();
 
 </script>
 
