@@ -3,31 +3,181 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <title>SomChat</title>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
   <style>
-    body {
+    * {
+      box-sizing: border-box;
       margin: 0;
+      padding: 0;
       font-family: Arial, sans-serif;
+    }
+
+    body {
       background: #f2f5f8;
+      min-height: 100vh;
     }
 
     header {
+      height: 65px;
       background: #087f5b;
       color: white;
-      padding: 18px;
-      text-align: center;
-      font-size: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 18px;
+    }
+
+    .logo {
+      font-size: 23px;
       font-weight: bold;
     }
 
-    .welcome {
-      text-align: center;
-      padding: 50px 20px;
+    #logout {
+      border: none;
+      background: white;
+      color: #087f5b;
+      padding: 9px 14px;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
     }
 
-    .welcome h1 {
-      color: #087f5b;
+    .app {
+      max-width: 1100px;
+      height: calc(100vh - 65px);
+      margin: auto;
+      display: flex;
+      background: white;
+    }
+
+    .users {
+      width: 320px;
+      border-right: 1px solid #ddd;
+      overflow-y: auto;
+    }
+
+    .users-title {
+      padding: 18px;
+      font-size: 20px;
+      font-weight: bold;
+      border-bottom: 1px solid #eee;
+    }
+
+    .user {
+      padding: 15px;
+      border-bottom: 1px solid #eee;
+      cursor: pointer;
+    }
+
+    .user:hover,
+    .user.active {
+      background: #eef8f5;
+    }
+
+    .username {
+      font-weight: bold;
+      color: #222;
+    }
+
+    .email {
+      font-size: 13px;
+      color: #777;
+      margin-top: 4px;
+    }
+
+    .chat {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .chat-header {
+      padding: 17px;
+      border-bottom: 1px solid #ddd;
+      font-weight: bold;
+      min-height: 60px;
+    }
+
+    #messages {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+      background: #f7f9fa;
+    }
+
+    .message {
+      max-width: 70%;
+      padding: 10px 13px;
+      margin-bottom: 10px;
+      border-radius: 12px;
+      word-wrap: break-word;
+    }
+
+    .mine {
+      margin-left: auto;
+      background: #d9fdd3;
+    }
+
+    .theirs {
+      background: white;
+      border: 1px solid #eee;
+    }
+
+    .time {
+      display: block;
+      font-size: 10px;
+      color: #777;
+      margin-top: 4px;
+    }
+
+    .send-box {
+      display: flex;
+      gap: 8px;
+      padding: 12px;
+      border-top: 1px solid #ddd;
+    }
+
+    #messageInput {
+      flex: 1;
+      padding: 13px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      outline: none;
+      font-size: 15px;
+    }
+
+    #sendButton {
+      border: none;
+      background: #087f5b;
+      color: white;
+      padding: 0 20px;
+      border-radius: 10px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    #status {
+      padding: 15px;
+      text-align: center;
+      color: #777;
+    }
+
+    @media (max-width: 700px) {
+      .users {
+        width: 120px;
+      }
+
+      .email {
+        display: none;
+      }
+
+      .message {
+        max-width: 85%;
+      }
     }
   </style>
 </head>
@@ -35,14 +185,367 @@
 <body>
 
 <header>
-  💬 SomChat
+  <div class="logo">💬 SomChat</div>
+  <button id="logout">Logout</button>
 </header>
 
-<div class="welcome">
-  <h1>Welcome to SomChat 🎉</h1>
-  <p>Login-ka wuu shaqeeyay!</p>
-  <p>SomChat ayaa diyaar ah.</p>
+<div class="app">
+
+  <div class="users">
+    <div class="users-title">Users</div>
+    <div id="userList">
+      <div id="status">Loading...</div>
+    </div>
+  </div>
+
+  <div class="chat">
+
+    <div class="chat-header" id="chatHeader">
+      Select a user to start chatting
+    </div>
+
+    <div id="messages">
+      <div id="status">
+        Choose someone from the user list.
+      </div>
+    </div>
+
+    <form class="send-box" id="sendForm">
+
+      <input
+        id="messageInput"
+        type="text"
+        placeholder="Write a message..."
+        autocomplete="off"
+      >
+
+      <button id="sendButton" type="submit">
+        Send
+      </button>
+
+    </form>
+
+  </div>
+
 </div>
+
+<script>
+
+const SUPABASE_URL =
+  "https://praguwyyshmhmmowofqv.supabase.co";
+
+const SUPABASE_KEY =
+  "sb_publishable_JPzVvllEgAUcBD_ahGZR6g_Z2rrzRDW";
+
+const supabaseClient =
+  window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+  );
+
+let currentUser = null;
+let selectedUser = null;
+
+
+// ================================
+// CHECK LOGIN
+// ================================
+
+async function checkUser() {
+
+  const {
+    data,
+    error
+  } = await supabaseClient.auth.getUser();
+
+  if (error || !data.user) {
+
+    window.location.href = "login.html";
+    return;
+
+  }
+
+  currentUser = data.user;
+
+  loadUsers();
+}
+
+
+// ================================
+// LOAD USERS
+// ================================
+
+async function loadUsers() {
+
+  const userList =
+    document.getElementById("userList");
+
+  const {
+    data,
+    error
+  } = await supabaseClient
+    .from("profiles")
+    .select("*")
+    .neq("id", currentUser.id);
+
+  if (error) {
+
+    console.error(error);
+
+    userList.innerHTML =
+      "<div id='status'>Could not load users.</div>";
+
+    return;
+  }
+
+  if (!data || data.length === 0) {
+
+    userList.innerHTML =
+      "<div id='status'>No other users yet.</div>";
+
+    return;
+  }
+
+  userList.innerHTML = "";
+
+  data.forEach(function(user) {
+
+    const div =
+      document.createElement("div");
+
+    div.className = "user";
+
+    div.innerHTML = `
+      <div class="username">
+        ${escapeHTML(user.username || "User")}
+      </div>
+
+      <div class="email">
+        ${escapeHTML(user.email || "")}
+      </div>
+    `;
+
+    div.addEventListener("click", function() {
+
+      document
+        .querySelectorAll(".user")
+        .forEach(x => x.classList.remove("active"));
+
+      div.classList.add("active");
+
+      selectedUser = user;
+
+      document.getElementById("chatHeader")
+        .textContent =
+        "Chat with " +
+        (user.username || "User");
+
+      loadMessages();
+
+    });
+
+    userList.appendChild(div);
+
+  });
+
+}
+
+
+// ================================
+// LOAD MESSAGES
+// ================================
+
+async function loadMessages() {
+
+  if (!selectedUser) return;
+
+  const messagesBox =
+    document.getElementById("messages");
+
+  messagesBox.innerHTML = "";
+
+  const {
+    data,
+    error
+  } = await supabaseClient
+    .from("messages")
+    .select("*")
+    .or(
+      `and(sender_id.eq.${currentUser.id},receiver_id.eq.${selectedUser.id}),and(sender_id.eq.${selectedUser.id},receiver_id.eq.${currentUser.id})`
+    )
+    .order("created_at", {
+      ascending: true
+    });
+
+  if (error) {
+
+    console.error(error);
+
+    messagesBox.innerHTML =
+      "<div id='status'>Could not load messages.</div>";
+
+    return;
+  }
+
+  if (!data || data.length === 0) {
+
+    messagesBox.innerHTML =
+      "<div id='status'>No messages yet. Say hello! 👋</div>";
+
+    return;
+  }
+
+  data.forEach(addMessage);
+
+  scrollMessages();
+}
+
+
+// ================================
+// ADD MESSAGE TO SCREEN
+// ================================
+
+function addMessage(msg) {
+
+  const messagesBox =
+    document.getElementById("messages");
+
+  const div =
+    document.createElement("div");
+
+  const mine =
+    msg.sender_id === currentUser.id;
+
+  div.className =
+    "message " +
+    (mine ? "mine" : "theirs");
+
+  const date =
+    new Date(msg.created_at);
+
+  div.innerHTML = `
+    ${escapeHTML(msg.message)}
+    <span class="time">
+      ${date.toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit"
+      })}
+    </span>
+  `;
+
+  messagesBox.appendChild(div);
+}
+
+
+// ================================
+// SEND MESSAGE
+// ================================
+
+document
+  .getElementById("sendForm")
+  .addEventListener("submit", async function(e) {
+
+    e.preventDefault();
+
+    if (!selectedUser) {
+
+      alert("Please select a user first.");
+
+      return;
+    }
+
+    const input =
+      document.getElementById("messageInput");
+
+    const text =
+      input.value.trim();
+
+    if (!text) return;
+
+    const {
+      error
+    } = await supabaseClient
+      .from("messages")
+      .insert({
+
+        sender_id: currentUser.id,
+
+        receiver_id: selectedUser.id,
+
+        message: text
+
+      });
+
+    if (error) {
+
+      console.error(error);
+
+      alert(
+        "Message could not be sent: " +
+        error.message
+      );
+
+      return;
+    }
+
+    input.value = "";
+
+    loadMessages();
+
+  });
+
+
+// ================================
+// LOGOUT
+// ================================
+
+document
+  .getElementById("logout")
+  .addEventListener("click", async function() {
+
+    await supabaseClient.auth.signOut();
+
+    window.location.href =
+      "login.html";
+
+  });
+
+
+// ================================
+// ESCAPE HTML
+// ================================
+
+function escapeHTML(text) {
+
+  const div =
+    document.createElement("div");
+
+  div.textContent =
+    text || "";
+
+  return div.innerHTML;
+
+}
+
+
+// ================================
+// AUTO REFRESH
+// ================================
+
+setInterval(function() {
+
+  if (selectedUser) {
+    loadMessages();
+  }
+
+}, 5000);
+
+
+// START
+
+checkUser();
+
+</script>
 
 </body>
 </html>
