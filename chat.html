@@ -1,802 +1,425 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <title>SomChat - Chat</title>
-
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: Arial, sans-serif;
-    }
-
-    body {
-      background: #e5ddd5;
-      height: 100vh;
-      overflow: hidden;
-    }
-
-    /* HEADER */
-
-    header {
-      height: 65px;
-      background: #075e54;
-      color: white;
-
-      display: flex;
-      align-items: center;
-
-      padding: 8px 12px;
-
-      gap: 12px;
-    }
-
-    .back {
-      border: none;
-      background: transparent;
-      color: white;
-
-      font-size: 28px;
-
-      cursor: pointer;
-    }
-
-    .avatar {
-      width: 45px;
-      height: 45px;
-
-      border-radius: 50%;
-
-      background: #128c7e;
-
-      display: flex;
-      align-items: center;
-      justify-content: center;
-
-      overflow: hidden;
-
-      font-size: 20px;
-    }
-
-    .avatar img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    .user-info {
-      flex: 1;
-      min-width: 0;
-    }
-
-    .username {
-      font-size: 17px;
-      font-weight: bold;
-    }
-
-    .online-status {
-      font-size: 12px;
-      margin-top: 2px;
-      color: #d1fae5;
-    }
-
-    /* MESSAGES */
-
-    #messages {
-      height: calc(100vh - 125px);
-
-      overflow-y: auto;
-
-      padding: 15px;
-
-      display: flex;
-      flex-direction: column;
-
-      gap: 7px;
-    }
-
-    .message {
-      max-width: 78%;
-
-      padding: 9px 11px;
-
-      border-radius: 10px;
-
-      word-wrap: break-word;
-
-      font-size: 15px;
-
-      box-shadow: 0 1px 2px rgba(0,0,0,.12);
-    }
-
-    .mine {
-      align-self: flex-end;
-
-      background: #dcf8c6;
-
-      border-bottom-right-radius: 3px;
-    }
-
-    .theirs {
-      align-self: flex-start;
-
-      background: white;
-
-      border-bottom-left-radius: 3px;
-    }
-
-    .message-text {
-      white-space: pre-wrap;
-    }
-
-    .message-time {
-      font-size: 10px;
-
-      color: #777;
-
-      text-align: right;
-
-      margin-top: 4px;
-    }
-
-    .empty-chat {
-      margin: auto;
-
-      background: rgba(255,255,255,.8);
-
-      padding: 12px 18px;
-
-      border-radius: 12px;
-
-      color: #777;
-
-      text-align: center;
-    }
-
-    /* INPUT */
-
-    .input-area {
-      height: 60px;
-
-      background: #f0f2f5;
-
-      display: flex;
-
-      align-items: center;
-
-      gap: 8px;
-
-      padding: 8px;
-    }
-
-    #messageInput {
-      flex: 1;
-
-      border: none;
-
-      outline: none;
-
-      background: white;
-
-      border-radius: 22px;
-
-      padding: 12px 16px;
-
-      font-size: 15px;
-
-      resize: none;
-
-      height: 44px;
-    }
-
-    #sendButton {
-      width: 44px;
-      height: 44px;
-
-      border: none;
-
-      border-radius: 50%;
-
-      background: #128c7e;
-
-      color: white;
-
-      font-size: 20px;
-
-      cursor: pointer;
-    }
-
-    #sendButton:disabled {
-      opacity: .5;
-    }
-
-    @media (max-width: 500px) {
-
-      .message {
-        max-width: 85%;
-      }
-
-      #messages {
-        padding: 10px;
-      }
-
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>SomChat Chat</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+  font-family:Arial,sans-serif;
+}
+
+body{
+  background:#e5ddd5;
+  height:100vh;
+  overflow:hidden;
+}
+
+header{
+  height:65px;
+  background:#075e54;
+  color:white;
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:8px 12px;
+}
+
+.back{
+  background:none;
+  border:0;
+  color:white;
+  font-size:30px;
+}
+
+.avatar{
+  width:45px;
+  height:45px;
+  border-radius:50%;
+  background:#128c7e;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden;
+}
+
+.avatar img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+
+.user-info{
+  flex:1;
+}
+
+.username{
+  font-size:17px;
+  font-weight:bold;
+}
+
+.status{
+  font-size:12px;
+}
+
+#messages{
+  height:calc(100vh - 125px);
+  overflow-y:auto;
+  padding:15px;
+  display:flex;
+  flex-direction:column;
+  gap:7px;
+}
+
+.message{
+  max-width:78%;
+  padding:9px 12px;
+  border-radius:10px;
+  word-break:break-word;
+}
+
+.mine{
+  align-self:flex-end;
+  background:#dcf8c6;
+}
+
+.theirs{
+  align-self:flex-start;
+  background:white;
+}
+
+.time{
+  font-size:10px;
+  color:#777;
+  text-align:right;
+  margin-top:4px;
+}
+
+.empty{
+  margin:auto;
+  background:white;
+  padding:15px;
+  border-radius:10px;
+  color:#777;
+}
+
+.input-area{
+  height:60px;
+  background:#f0f2f5;
+  display:flex;
+  gap:8px;
+  padding:8px;
+}
+
+#messageInput{
+  flex:1;
+  border:0;
+  outline:0;
+  border-radius:22px;
+  padding:12px 16px;
+  font-size:16px;
+}
+
+#sendButton{
+  width:44px;
+  height:44px;
+  border:0;
+  border-radius:50%;
+  background:#128c7e;
+  color:white;
+  font-size:20px;
+}
+
+@media(max-width:500px){
+  .message{
+    max-width:85%;
+  }
+}
+</style>
 </head>
 
 <body>
 
-<!-- HEADER -->
-
 <header>
 
-  <button
-    class="back"
-    onclick="goBack()">
-    ‹
-  </button>
+<button class="back" onclick="history.back()">‹</button>
 
-  <div
-    id="avatar"
-    class="avatar">
-    👤
-  </div>
+<div id="avatar" class="avatar">👤</div>
 
-  <div class="user-info">
-
-    <div
-      id="username"
-      class="username">
-      Loading...
-    </div>
-
-    <div
-      id="onlineStatus"
-      class="online-status">
-      Loading...
-    </div>
-
-  </div>
+<div class="user-info">
+  <div id="username" class="username">Loading...</div>
+  <div id="status" class="status">...</div>
+</div>
 
 </header>
 
-
-<!-- MESSAGES -->
-
 <div id="messages">
-
-  <div class="empty-chat">
-    Loading messages...
-  </div>
-
+  <div class="empty">Loading messages...</div>
 </div>
-
-
-<!-- INPUT -->
 
 <div class="input-area">
 
-  <input
-    id="messageInput"
-    type="text"
-    placeholder="Write a message..."
-    autocomplete="off"
-  >
+<input
+  id="messageInput"
+  type="text"
+  placeholder="Write a message..."
+  autocomplete="off"
+>
 
-  <button
-    id="sendButton">
-    ➤
-  </button>
+<button id="sendButton">➤</button>
 
 </div>
 
-
 <script>
 
-// ==========================================
+// ===============================
 // SUPABASE
-// ==========================================
+// ===============================
 
 const SUPABASE_URL =
-  "https://praguwyyshmhmmowofqv.supabase.co";
+"https://praguwyyshmhmmowofqv.supabase.co";
 
 const SUPABASE_ANON_KEY =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InByYWd1d3l5c2htaG1tb3dvZnF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY1NzA3NjYsImV4cCI6MjEwMjE0Njc2Nn0.oJjsk_93uBMLeT-8ydDeecJBpcKI4IwTZaVmDU0t-fk";
+"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzIiwicmVmIjoicHJhZ3V3eXlzaG1obW1vd29mcXZxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY1NzA3NjYsImV4cCI6MjEwMjE0Njc2Nn0.oJjsk_93uBMLeT-8ydDeecJBpcKI4IwTZaVmDU0t-fk";
 
 const supabaseClient =
-  window.supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_ANON_KEY
-  );
+window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_ANON_KEY
+);
 
 
-// ==========================================
+// ===============================
 // VARIABLES
-// ==========================================
+// ===============================
 
 let currentUser = null;
 
 let receiverId = null;
 
-let receiverProfile = null;
 
-let realtimeChannel = null;
-
-
-// ==========================================
-// GET USER ID FROM URL
-// ==========================================
+// Get ?user=ID
 
 const params =
-  new URLSearchParams(
-    window.location.search
-  );
+new URLSearchParams(
+  window.location.search
+);
 
 receiverId =
-  params.get("user");
+params.get("user");
 
 
-// ==========================================
+// ===============================
 // START
-// ==========================================
+// ===============================
 
-async function startChat() {
+async function start(){
 
-  if (!receiverId) {
+  if(!receiverId){
 
-    alert("User lama dooran.");
+    alert("User lama dooran");
 
-    window.location.href =
-      "users.html";
+    location.href="users.html";
 
     return;
   }
-
-
-  // Check current login
 
   const {
     data,
     error
   } =
-    await supabaseClient.auth.getUser();
+  await supabaseClient.auth.getUser();
 
+  if(error || !data.user){
 
-  if (error || !data.user) {
-
-    window.location.href =
-      "login.html";
+    location.href="login.html";
 
     return;
   }
-
 
   currentUser =
-    data.user;
-
-
-  // Cannot chat yourself
-
-  if (currentUser.id === receiverId) {
-
-    alert("Naftaada lama chat-gareyn karo.");
-
-    window.location.href =
-      "users.html";
-
-    return;
-  }
-
+  data.user;
 
   await loadReceiver();
 
   await loadMessages();
 
-  await markMessagesSeen();
-
-  subscribeMessages();
-
+  startRealtime();
 }
 
 
-// ==========================================
-// LOAD RECEIVER
-// ==========================================
+// ===============================
+// RECEIVER
+// ===============================
 
-async function loadReceiver() {
+async function loadReceiver(){
 
   const {
     data,
     error
   } =
-    await supabaseClient
-      .from("profiles")
-      .select(
-        "id, username, country, avatar_url, online"
-      )
-      .eq("id", receiverId)
-      .single();
+  await supabaseClient
+  .from("profiles")
+  .select(
+    "id,username,country,avatar_url,online"
+  )
+  .eq("id",receiverId)
+  .single();
 
+  if(error || !data){
 
-  if (error || !data) {
+    alert("User lama helin");
 
-    alert("User-ka lama helin.");
-
-    window.location.href =
-      "users.html";
+    location.href="users.html";
 
     return;
   }
 
-
-  receiverProfile =
-    data;
-
+  document
+  .getElementById("username")
+  .textContent =
+  data.username || "User";
 
   document
-    .getElementById("username")
-    .textContent =
-    data.username || "User";
-
-
-  document
-    .getElementById("onlineStatus")
-    .textContent =
-    data.online
-      ? "● Online"
-      : "Offline";
-
+  .getElementById("status")
+  .textContent =
+  data.online
+  ? "● Online"
+  : "Offline";
 
   const avatar =
-    document.getElementById("avatar");
+  document.getElementById("avatar");
 
+  if(data.avatar_url){
 
-  avatar.innerHTML = "";
-
-
-  if (data.avatar_url) {
-
-    const img =
-      document.createElement("img");
-
-    img.src =
-      data.avatar_url;
-
-    img.alt =
-      data.username || "User";
-
-    avatar.appendChild(img);
-
-  } else {
-
-    avatar.textContent =
-      "👤";
+    avatar.innerHTML =
+    `<img src="${data.avatar_url}">`;
 
   }
 
 }
 
 
-// ==========================================
+// ===============================
 // LOAD MESSAGES
-// ==========================================
+// ===============================
 
-async function loadMessages() {
+async function loadMessages(){
 
   const {
     data,
     error
   } =
-    await supabaseClient
-      .from("messages")
-      .select(`
-        id,
-        sender_id,
-        receiver_id,
-        content,
-        delivered,
-        seen,
-        created_at
-      `)
-      .or(
-        `and(sender_id.eq.${currentUser.id},receiver_id.eq.${receiverId}),and(sender_id.eq.${receiverId},receiver_id.eq.${currentUser.id})`
-      )
-      .order(
-        "created_at",
-        {
-          ascending: true
-        }
-      );
+  await supabaseClient
+  .from("messages")
+  .select(
+    "id,sender_id,receiver_id,message,created_at"
+  )
+  .or(
+    `and(sender_id.eq.${currentUser.id},receiver_id.eq.${receiverId}),and(sender_id.eq.${receiverId},receiver_id.eq.${currentUser.id})`
+  )
+  .order(
+    "created_at",
+    {ascending:true}
+  );
 
-
-  if (error) {
+  if(error){
 
     console.error(error);
 
-    showError(error.message);
+    document
+    .getElementById("messages")
+    .innerHTML =
+    `<div class="empty">
+      ❌ ${error.message}
+    </div>`;
 
     return;
   }
-
 
   renderMessages(data || []);
-
 }
 
 
-// ==========================================
-// RENDER MESSAGES
-// ==========================================
+// ===============================
+// DISPLAY
+// ===============================
 
-function renderMessages(messages) {
+function renderMessages(list){
 
   const box =
-    document.getElementById(
-      "messages"
-    );
+  document.getElementById("messages");
 
+  box.innerHTML="";
 
-  box.innerHTML = "";
+  if(list.length===0){
 
-
-  if (messages.length === 0) {
-
-    box.innerHTML = `
-      <div class="empty-chat">
-        👋 Start your conversation
-      </div>
-    `;
+    box.innerHTML =
+    `<div class="empty">
+      👋 Start your conversation
+    </div>`;
 
     return;
   }
 
+  list.forEach(addMessage);
 
-  messages.forEach(message => {
-
-    const div =
-      document.createElement("div");
-
-
-    const mine =
-      message.sender_id ===
-      currentUser.id;
-
-
-    div.className =
-      "message " +
-      (mine
-        ? "mine"
-        : "theirs");
-
-
-    const text =
-      document.createElement("div");
-
-    text.className =
-      "message-text";
-
-    text.textContent =
-      message.content;
-
-
-    const time =
-      document.createElement("div");
-
-    time.className =
-      "message-time";
-
-
-    const date =
-      new Date(
-        message.created_at
-      );
-
-
-    let status = "";
-
-
-    if (mine) {
-
-      if (message.seen) {
-
-        status = " ✓✓";
-
-      } else if (message.delivered) {
-
-        status = " ✓";
-
-      } else {
-
-        status = " •";
-
-      }
-
-    }
-
-
-    time.textContent =
-      formatTime(date) +
-      status;
-
-
-    div.appendChild(text);
-
-    div.appendChild(time);
-
-    box.appendChild(div);
-
-  });
-
-
-  scrollToBottom();
-
+  scrollBottom();
 }
 
 
-// ==========================================
-// SEND MESSAGE
-// ==========================================
+// ===============================
+// ADD MESSAGE
+// ===============================
 
-async function sendMessage() {
-
-  const input =
-    document.getElementById(
-      "messageInput"
-    );
-
-  const button =
-    document.getElementById(
-      "sendButton"
-    );
-
-
-  const content =
-    input.value.trim();
-
-
-  if (!content) {
-    return;
-  }
-
-
-  if (!currentUser || !receiverId) {
-    return;
-  }
-
-
-  button.disabled = true;
-
-
-  const {
-    data,
-    error
-  } =
-    await supabaseClient
-      .from("messages")
-      .insert({
-
-        sender_id:
-          currentUser.id,
-
-        receiver_id:
-          receiverId,
-
-        content:
-          content,
-
-        delivered:
-          false,
-
-        seen:
-          false
-
-      })
-      .select()
-      .single();
-
-
-  button.disabled = false;
-
-
-  if (error) {
-
-    console.error(error);
-
-    alert(
-      "Message lama dirin: " +
-      error.message
-    );
-
-    return;
-  }
-
-
-  input.value = "";
-
-
-  // Show immediately
-
-  if (data) {
-
-    addSingleMessage(data);
-
-  }
-
-}
-
-
-// ==========================================
-// ADD SINGLE MESSAGE
-// ==========================================
-
-function addSingleMessage(message) {
+function addMessage(row){
 
   const box =
-    document.getElementById(
-      "messages"
-    );
-
+  document.getElementById("messages");
 
   const empty =
-    box.querySelector(
-      ".empty-chat"
-    );
+  box.querySelector(".empty");
 
-
-  if (empty) {
-    empty.remove();
-  }
-
+  if(empty) empty.remove();
 
   const div =
-    document.createElement("div");
-
+  document.createElement("div");
 
   const mine =
-    message.sender_id ===
-    currentUser.id;
-
+  row.sender_id === currentUser.id;
 
   div.className =
-    "message " +
-    (mine
-      ? "mine"
-      : "theirs");
-
+  mine
+  ? "message mine"
+  : "message theirs";
 
   const text =
-    document.createElement("div");
-
-  text.className =
-    "message-text";
+  document.createElement("div");
 
   text.textContent =
-    message.content;
-
+  row.message;
 
   const time =
-    document.createElement("div");
+  document.createElement("div");
 
-  time.className =
-    "message-time";
-
+  time.className="time";
 
   time.textContent =
-    formatTime(
-      new Date(
-        message.created_at
-      )
-    ) +
-    (mine
-      ? " •"
-      : "");
-
+  new Date(
+    row.created_at
+  ).toLocaleTimeString(
+    [],
+    {
+      hour:"2-digit",
+      minute:"2-digit"
+    }
+  );
 
   div.appendChild(text);
 
@@ -804,265 +427,171 @@ function addSingleMessage(message) {
 
   box.appendChild(div);
 
-
-  scrollToBottom();
-
+  scrollBottom();
 }
 
 
-// ==========================================
-// REALTIME
-// ==========================================
+// ===============================
+// SEND
+// ===============================
 
-function subscribeMessages() {
+async function sendMessage(){
 
-  realtimeChannel =
-    supabaseClient
-      .channel(
-        "chat-" +
-        currentUser.id +
-        "-" +
-        receiverId
-      )
-      .on(
-        "postgres_changes",
-        {
-          event: "INSERT",
-          schema: "public",
-          table: "messages"
-        },
-        async function(payload) {
+  const input =
+  document.getElementById(
+    "messageInput"
+  );
 
-          const message =
-            payload.new;
+  const message =
+  input.value.trim();
 
-
-          const belongsToChat =
-            (
-              message.sender_id ===
-              currentUser.id &&
-              message.receiver_id ===
-              receiverId
-            ) ||
-            (
-              message.sender_id ===
-              receiverId &&
-              message.receiver_id ===
-              currentUser.id
-            );
-
-
-          if (!belongsToChat) {
-            return;
-          }
-
-
-          // Don't duplicate own message
-
-          if (
-            message.sender_id ===
-            currentUser.id
-          ) {
-
-            await loadMessages();
-
-            return;
-
-          }
-
-
-          // Mark received message delivered
-
-          await supabaseClient
-            .from("messages")
-            .update({
-              delivered: true
-            })
-            .eq(
-              "id",
-              message.id
-            );
-
-
-          addSingleMessage({
-            ...message,
-            delivered: true
-          });
-
-
-          // Mark seen
-
-          await markMessagesSeen();
-
-        }
-      )
-      .subscribe();
-
-}
-
-
-// ==========================================
-// MARK SEEN
-// ==========================================
-
-async function markMessagesSeen() {
+  if(!message) return;
 
   const {
+    data,
     error
   } =
-    await supabaseClient
-      .from("messages")
-      .update({
-        seen: true,
-        delivered: true
-      })
-      .eq(
-        "sender_id",
-        receiverId
-      )
-      .eq(
-        "receiver_id",
-        currentUser.id
-      )
-      .eq(
-        "seen",
-        false
-      );
+  await supabaseClient
+  .from("messages")
+  .insert({
+    sender_id:
+    currentUser.id,
 
+    receiver_id:
+    receiverId,
 
-  if (error) {
+    message:
+    message
+  })
+  .select()
+  .single();
 
-    console.error(
-      "Seen error:",
-      error
+  if(error){
+
+    alert(
+      "Message lama dirin:\n"+
+      error.message
     );
 
+    console.error(error);
+
+    return;
   }
 
+  input.value="";
+
+  // Show immediately
+  addMessage(data);
 }
 
 
-// ==========================================
-// FORMAT TIME
-// ==========================================
+// ===============================
+// REALTIME
+// ===============================
 
-function formatTime(date) {
+function startRealtime(){
 
-  return date.toLocaleTimeString(
-    [],
+  supabaseClient
+  .channel(
+    "messages-room"
+  )
+  .on(
+    "postgres_changes",
     {
-      hour: "2-digit",
-      minute: "2-digit"
-    }
-  );
+      event:"INSERT",
+      schema:"public",
+      table:"messages"
+    },
+    payload => {
 
-}
+      const row =
+      payload.new;
 
+      const belongs =
+      (
+        row.sender_id === currentUser.id &&
+        row.receiver_id === receiverId
+      )
+      ||
+      (
+        row.sender_id === receiverId &&
+        row.receiver_id === currentUser.id
+      );
 
-// ==========================================
-// SCROLL
-// ==========================================
+      if(!belongs) return;
 
-function scrollToBottom() {
-
-  const box =
-    document.getElementById(
-      "messages"
-    );
-
-  setTimeout(() => {
-
-    box.scrollTop =
-      box.scrollHeight;
-
-  }, 50);
-
-}
-
-
-// ==========================================
-// ERROR
-// ==========================================
-
-function showError(message) {
-
-  document.getElementById(
-    "messages"
-  ).innerHTML = `
-    <div class="empty-chat">
-      ❌ ${escapeHtml(message)}
-    </div>
-  `;
-
-}
-
-
-function escapeHtml(text) {
-
-  const div =
-    document.createElement("div");
-
-  div.textContent =
-    text;
-
-  return div.innerHTML;
-
-}
-
-
-// ==========================================
-// SEND BUTTON
-// ==========================================
-
-document
-  .getElementById("sendButton")
-  .addEventListener(
-    "click",
-    sendMessage
-  );
-
-
-// ==========================================
-// ENTER TO SEND
-// ==========================================
-
-document
-  .getElementById("messageInput")
-  .addEventListener(
-    "keydown",
-    function(event) {
-
-      if (
-        event.key === "Enter"
-      ) {
-
-        event.preventDefault();
-
-        sendMessage();
-
+      // Own messages already displayed
+      if(
+        row.sender_id === currentUser.id
+      ){
+        return;
       }
 
+      addMessage(row);
+
     }
-  );
-
-
-// ==========================================
-// BACK
-// ==========================================
-
-function goBack() {
-
-  window.location.href =
-    "users.html";
-
+  )
+  .subscribe();
 }
 
 
-// ==========================================
-// START
-// ==========================================
+// ===============================
+// SCROLL
+// ===============================
 
-startChat();
+function scrollBottom(){
+
+  const box =
+  document.getElementById(
+    "messages"
+  );
+
+  setTimeout(()=>{
+    box.scrollTop =
+    box.scrollHeight;
+  },50);
+}
+
+
+// ===============================
+// BUTTON
+// ===============================
+
+document
+.getElementById("sendButton")
+.addEventListener(
+  "click",
+  sendMessage
+);
+
+
+// ===============================
+// ENTER
+// ===============================
+
+document
+.getElementById("messageInput")
+.addEventListener(
+  "keydown",
+  e => {
+
+    if(e.key==="Enter"){
+
+      e.preventDefault();
+
+      sendMessage();
+
+    }
+
+  }
+);
+
+
+// ===============================
+// START
+// ===============================
+
+start();
 
 </script>
 
