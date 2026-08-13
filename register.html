@@ -31,7 +31,7 @@
       background: white;
       padding: 30px 25px;
       border-radius: 18px;
-      box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+      box-shadow: 0 8px 30px rgba(0,0,0,.08);
     }
 
     .logo {
@@ -86,7 +86,7 @@
     }
 
     button:disabled {
-      opacity: 0.6;
+      opacity: .6;
     }
 
     #message {
@@ -169,9 +169,10 @@
 </div>
 
 <script>
-  // ================================
-  // SOMCHAT SUPABASE CONFIG
-  // ================================
+
+  // ============================
+  // SUPABASE CONFIG
+  // ============================
 
   const SUPABASE_URL =
     "https://praguwyyshmhmmowofqv.supabase.co";
@@ -185,9 +186,10 @@
       SUPABASE_KEY
     );
 
-  // ================================
-  // REGISTER
-  // ================================
+
+  // ============================
+  // ELEMENTS
+  // ============================
 
   const form =
     document.getElementById("registerForm");
@@ -198,70 +200,141 @@
   const button =
     document.getElementById("registerButton");
 
+
+  // ============================
+  // REGISTER
+  // ============================
+
   form.addEventListener("submit", async function(event) {
 
     event.preventDefault();
 
     const username =
       document.getElementById("username")
-        .value
-        .trim();
+      .value
+      .trim();
 
     const email =
       document.getElementById("email")
-        .value
-        .trim();
+      .value
+      .trim()
+      .toLowerCase();
 
     const password =
       document.getElementById("password")
-        .value;
+      .value;
 
     message.textContent = "";
     message.style.color = "#555";
 
     if (username.length < 3) {
+
       message.textContent =
         "Username must be at least 3 characters.";
+
       return;
     }
 
     if (password.length < 6) {
+
       message.textContent =
         "Password must be at least 6 characters.";
+
       return;
     }
 
     button.disabled = true;
     button.textContent = "Creating account...";
 
+
     try {
 
-      // Create Supabase Auth account
-      const {
-        data,
-        error
-      } = await supabaseClient.auth.signUp({
-        email: email,
-        password: password
-      });
+      // ============================
+      // CREATE AUTH ACCOUNT
+      // ============================
+
+      const result =
+        await supabaseClient.auth.signUp({
+
+          email: email,
+
+          password: password,
+
+          options: {
+
+            data: {
+              username: username
+            }
+
+          }
+
+        });
+
+
+      const data = result.data;
+      const error = result.error;
+
 
       if (error) {
         throw error;
       }
 
-      if (!data.user) {
+
+      if (!data || !data.user) {
+
         throw new Error(
-          "Account could not be created."
+          "Account was not created."
         );
+
       }
 
-      // Create profile
-      const {
-        error: profileError
-      } = await supabaseClient
-        .from("profiles")
-        .insert({
-          id: data.user.id,
-          username: username,
-          email: email,
-          country: "Som
+
+      // ============================
+      // SUCCESS
+      // ============================
+
+      message.style.color = "#087f5b";
+
+      message.innerHTML =
+        "✅ Account created successfully!<br>" +
+        "Opening login...";
+
+
+      // Go to login page
+
+      setTimeout(function() {
+
+        window.location.href =
+          "login.html";
+
+      }, 1200);
+
+
+    } catch (error) {
+
+      console.error(
+        "REGISTER ERROR:",
+        error
+      );
+
+      message.style.color = "#d9534f";
+
+      message.textContent =
+        error.message ||
+        "Could not create account.";
+
+    } finally {
+
+      button.disabled = false;
+
+      button.textContent =
+        "Create Account";
+
+    }
+
+  });
+
+</script>
+
+</body>
+</html>
